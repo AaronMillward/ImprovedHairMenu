@@ -44,7 +44,7 @@ function HairMenuPanel:new(x, y, size_x, size_y, rows, cols, gap, isBeard)
 	o.pages = {}
 	o.page_current = 1
 	o.onSelect = nil
-	o.selected_display = "None selected"
+	o.selected_display = ""
 	o.isBeard = isBeard
 	return o
 end

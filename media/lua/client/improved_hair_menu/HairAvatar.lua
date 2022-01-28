@@ -19,6 +19,9 @@ function HairAvatar:new(x, y, width, height, isBeard)
 	o.onSelect = nil
 	o.avatarBackgroundTexture = getTexture("media/ui/avatarBackground.png")
 	o.isBeard = isBeard
+	-- o.tickTexture = getTexture("Quest_Succeed")
+	-- o.crossTexture = getTexture("Quest_Failed");
+	-- o.drawIcon = nil
 	return o
 end
 
@@ -34,8 +37,19 @@ end
 
 function HairAvatar:prerender()
 	base.prerender(self)
-	self:drawTextureScaled(self.avatarBackgroundTexture, 0, 0, self.width, self.height, 1, 1, 1, 1);
+	self:drawTextureScaled(self.avatarBackgroundTexture, 0, 0, self.width, self.height, 1, 1, 1, 1)
 end
+
+-- function HairAvatar:render()
+-- 	base.render(self)
+-- 	if self.drawIcon then
+-- 		if self.drawIcon == "tick" then
+-- 			self:drawTexture(self.tickTexture, self:getRight(), 0, 1, 1, 1, 1);
+-- 		elseif self.drawIcon == "cross" then
+-- 			self:drawTexture(self.crossTexture, self:getRight(), 0, 1, 1, 1, 1);
+-- 		end
+-- 	end
+-- end
 
 function HairAvatar:onMouseMove(dx, dy)
 	-- This is mostly repeated but it preserves the vanilla code
@@ -105,7 +119,15 @@ function HairAvatar:applyHair()
 		In and ideal scenario we copy the description to avoid editing the one we are passed but I've got no idea how to do that from Lua.
 	]]
 
-	local visual = self.desc:getHumanVisual()
+	local visual = nil
+
+	if self.desc then
+		visual = self.desc:getHumanVisual()
+	elseif self.char then
+		visual = self.char:getHumanVisual()
+	else
+		return
+	end
 
 	local original_getter = nil
 	local original_setter = nil
@@ -121,8 +143,9 @@ function HairAvatar:applyHair()
 	local original_hair = original_getter(visual)
 	original_setter(visual, self.hair_id)
 	
+	--This appears to copy the desc likely because ISUI3DModel has a java call that probably copies the table by into an object
 	if self.desc then 
-		self:setSurvivorDesc(self.desc) --This appears to copy the desc likely because it has a java call that probably copies the table by into an object
+		self:setSurvivorDesc(self.desc)
 	elseif self.char then
 		self:setCharacter(self.char)
 	end
