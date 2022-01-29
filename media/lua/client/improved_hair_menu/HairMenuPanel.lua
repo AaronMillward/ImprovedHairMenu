@@ -46,6 +46,7 @@ function HairMenuPanel:new(x, y, size_x, size_y, rows, cols, gap, isBeard)
 	o.onSelect = nil
 	o.selected_display = ""
 	o.isBeard = isBeard
+	o.showNameOnHover = false
 	return o
 end
 
@@ -87,6 +88,18 @@ function HairMenuPanel:initialise()
 			hairAvatar.onSelect = function(hairAvatar)
 				self.selected_display = hairAvatar.hair_display
 				if self.onSelect then self.onSelect(hairAvatar.hair_id) end
+			end
+			local old_onMouseMove = hairAvatar.onMouseMove
+			hairAvatar.onMouseMove = function(avatar, x, y)
+				old_onMouseMove(avatar, x, y)
+
+				if self.showNameOnHover then
+					local x = self:getMouseX()
+					local y = self:getMouseY()
+					if avatar:containsPoint(x,y) then
+						self.selected_display = avatar.hair_display
+					end
+				end
 			end
 
 			self:addChild(hairAvatar)

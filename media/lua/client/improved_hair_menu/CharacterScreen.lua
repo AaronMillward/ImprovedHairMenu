@@ -25,6 +25,7 @@ function HairMenuPanelWindow:createChildren()
 	self.resizable = false
 
 	self.hairPanel = HairMenuPanel:new(0,th, 96,96, 2,3, 3, false)
+	self.hairPanel.showNameOnHover = true
 	self.hairPanel:initialise()
 	self.hairPanel:setChar(self.char)
 	self.hairPanel.onSelect = function(select_name)
@@ -107,7 +108,7 @@ function ihm_open_hair_menu(player, hair_options, title)
 	for k,v in ipairs(hair_options) do
 		local info = {}
 		info.id = v.param1
-		info.display = v.name
+		info.display = string.gsub(v.name,title,"") 
 		table.insert(hairlist, info)
 	end
 
