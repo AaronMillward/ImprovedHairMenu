@@ -74,6 +74,21 @@ end
 --## Hair Styles ##
 --#################
 
+local small_avatar_size = 46
+local normal_avatar_size = 96
+
+local function get_menu_parameters()
+	local avatar_size = normal_avatar_size
+	local grid_size = {rows = 2, cols = 3}
+	
+	if getCore():getScreenHeight() <= 768 then 
+		avatar_size = small_avatar_size 
+		grid_size = {rows = 1, cols = 5}
+	end
+
+	return avatar_size, grid_size
+end
+
 --[[
 	Here's where we replace the original hair combo with our new menu.
 	This does overwrite the original code but compared with rearranging the existing elements by hand this just seems easier.
@@ -87,6 +102,9 @@ end
 		We do this to stop click through selecting different hairs under the color picker
 ]]
 function CharacterCreationMain:createHairTypeBtn()
+	
+	local avatar_size, grid_size = get_menu_parameters()
+
 	local comboHgt = FONT_HGT_SMALL + 3 * 2
 	
 	local lbl = ISLabel:new(self.xOffset, self.yOffset, FONT_HGT_MEDIUM, getText("UI_characreation_hair"), 1, 1, 1, 1, UIFont.Medium, true);
@@ -108,7 +126,7 @@ function CharacterCreationMain:createHairTypeBtn()
 	self.hairTypeCombo:setVisible(false);
 	self.hairType = 0
 
-	self.hairMenu = HairMenuPanel:new(self.xOffset, self.yOffset, 96,96,2,3,3,false)
+	self.hairMenu = HairMenuPanel:new(self.xOffset, self.yOffset, avatar_size,avatar_size, grid_size.rows,grid_size.cols, 3, false)
 	self.hairMenu:initialise()
 	self.hairMenu:setDesc(MainScreen.instance.desc)
 	self.hairMenu.onSelect = function(select_name)
@@ -212,6 +230,8 @@ end
 
 function CharacterCreationMain:createBeardTypeBtn()
 	local comboHgt = FONT_HGT_SMALL + 3 * 2
+
+	local avatar_size, grid_size = get_menu_parameters()
 	
 	self.beardLbl = ISLabel:new(self.xOffset, self.yOffset, FONT_HGT_MEDIUM, getText("UI_characreation_beard"), 1, 1, 1, 1, UIFont.Medium, true);
 	self.beardLbl:initialise();
@@ -240,7 +260,7 @@ function CharacterCreationMain:createBeardTypeBtn()
 	self.beardTypeCombo:setVisible(false);
 	self.characterPanel:addChild(self.beardTypeCombo)
 
-	self.beardMenu = HairMenuPanel:new(self.xOffset, self.yOffset, 96,96,1,3,3,true)
+	self.beardMenu = HairMenuPanel:new(self.xOffset, self.yOffset, avatar_size,avatar_size, 1,grid_size.cols, 3, true)
 	self.beardMenu:initialise()
 	self.beardMenu:setDesc(MainScreen.instance.desc)
 	self.beardMenu.onSelect = function(select_name)
