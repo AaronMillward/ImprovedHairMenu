@@ -53,17 +53,17 @@ end
 function HairMenuPanel:initialise()
 	local fnt_height = getTextManager():MeasureFont(self.font);
 
-	local offset_x = 0
-	local offset_y = fnt_height/2
+	self.offset_x = 0
+	self.offset_y = fnt_height/2
 
-	self.pageLeftButton = ISButton:new(5, offset_y, 15, 15, "", self, self.onChangePage)
+	self.pageLeftButton = ISButton:new(5, self.offset_y, 15, 15, "", self, self.onChangePage)
 	self.pageLeftButton.internal = "PREV"
 	self.pageLeftButton:initialise()
 	self.pageLeftButton:instantiate()
 	self.pageLeftButton:setImage(getTexture("media/ui/ArrowLeft.png"))
 	self:addChild(self.pageLeftButton)
 	
-	self.pageRightButton = ISButton:new(self.pageLeftButton:getRight() + 5, offset_y, 15, 15, "", self, self.onChangePage)
+	self.pageRightButton = ISButton:new(self.pageLeftButton:getRight() + 5, self.offset_y, 15, 15, "", self, self.onChangePage)
 	self.pageRightButton.internal = "NEXT"
 	self.pageRightButton:initialise()
 	self.pageRightButton:instantiate()
@@ -73,14 +73,13 @@ function HairMenuPanel:initialise()
 	--Here we create the styles page, note that there is only one page of avatars. 
 	--this is to reduce the number of 3d models by loading the hairs onto these avatars when switching pages
 
-	offset_y = offset_y + 20
+	self.offset_y = self.offset_y + 20
 	for h=1,self.hair_rows do
 		for v=1,self.hair_cols do
 			local idx = ((h-1)*self.hair_cols) + v
 			
-			local gap = 3
-			local x = ((v-1) * self.hair_size_x) + (gap*(v-1))
-			local y = (offset_y + ((h-1) * self.hair_size_y)) + (gap*(h-1))
+			local x = ((v-1) * self.hair_size_x) + (self.gap*(v-1))
+			local y = (self.offset_y + ((h-1) * self.hair_size_y)) + (self.gap*(h-1))
 			local hairAvatar = HairAvatar:new(x, y, self.hair_size_x, self.hair_size_y, self.isBeard)
 			hairAvatar:initialise()
 			hairAvatar:instantiate()
@@ -106,6 +105,8 @@ function HairMenuPanel:initialise()
 			self.avatarList[idx] = hairAvatar
 		end
 	end
+
+	self.offset_y = self.offset_y + (self.hair_rows * self.hair_size_y) + (self.gap * (self.hair_rows-1))
 end
 
 function HairMenuPanel:setDesc(desc)

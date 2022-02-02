@@ -56,6 +56,7 @@ function CharacterCreationMain:disableBtn()
 	if self.beardTypeCombo and self.beardMenu then
 		local vis = not MainScreen.instance.desc:isFemale()
 		self.beardMenu:setVisible(vis)
+		if self.beardMenuButton then self.beardMenuButton:setVisible(vis) end
 		if vis then
 			local hairs = {}
 			for i=1,#self.beardTypeCombo.options do
@@ -74,19 +75,14 @@ end
 --## Hair Styles ##
 --#################
 
-local small_avatar_size = 46
-local normal_avatar_size = 96
+local avatar_size = 96
 
 local function get_menu_parameters()
-	local avatar_size = normal_avatar_size
-	local grid_size = {rows = 2, cols = 3}
-	
-	if getCore():getScreenHeight() <= 768 then 
-		avatar_size = small_avatar_size 
-		grid_size = {rows = 1, cols = 5}
-	end
-
-	return avatar_size, grid_size
+	--[[
+		786 is what I've seen in a lot of vanilla code,
+		I'm not certain of its significance but I think it's a common laptop resolution
+	]]
+	return (getCore():getScreenHeight() <= 768) 
 end
 
 --[[
@@ -102,8 +98,7 @@ end
 		We do this to stop click through selecting different hairs under the color picker
 ]]
 function CharacterCreationMain:createHairTypeBtn()
-	
-	local avatar_size, grid_size = get_menu_parameters()
+	local low_res = get_menu_parameters()
 
 	local comboHgt = FONT_HGT_SMALL + 3 * 2
 	
@@ -125,10 +120,18 @@ function CharacterCreationMain:createHairTypeBtn()
 	self.characterPanel:addChild(self.hairTypeCombo)
 	self.hairTypeCombo:setVisible(false);
 	self.hairType = 0
+	--Don't increment the y offset here, the combo is invisible and the menu takes its place
 
-	self.hairMenu = HairMenuPanel:new(self.xOffset, self.yOffset, avatar_size,avatar_size, grid_size.rows,grid_size.cols, 3, false)
-	self.hairMenu:initialise()
-	self.hairMenu:setDesc(MainScreen.instance.desc)
+
+	local panelType = nil
+
+	if low_res == true then
+		panelType = HairMenuPanelModal
+	else
+		panelType = HairMenuPanel
+	end
+
+	self.hairMenu = panelType:new(self.xOffset, self.yOffset, avatar_size,avatar_size, 2,3, 3, false)
 	self.hairMenu.onSelect = function(select_name)
 		for i=1,#self.hairTypeCombo.options do
 			local name = self.hairTypeCombo:getOptionData(i):lower()
@@ -163,9 +166,34 @@ function CharacterCreationMain:createHairTypeBtn()
 			end
 		end
 	end
-	self.characterPanel:addChild(self.hairMenu)
+	self.hairMenu:initialise()
+	self.hairMenu:setDesc(MainScreen.instance.desc)
+	
+	if low_res == true then
+		local function showMenu(target)
+			target:removeChild(target.hairMenu)
+			target:addChild(target.hairMenu)
+			target.hairMenu:setX( (target:getWidth()/2) - (target.hairMenu:getWidth()/2) )
+			target.hairMenu:setY( (target:getHeight()/2) - (target.hairMenu:getHeight()/2) )
+			target.hairMenu:setCapture(true)
+		end
 
-	self.yOffset = self.yOffset + self.hairMenu:getHeight() + 5;
+		self.hairMenu.onClose = function()
+			self:removeChild(self.hairMenu)
+			self.hairMenu:setCapture(false)
+		end
+
+		self.hairMenuButton = ISButton:new(self.xOffset, self.yOffset, 45, FONT_HGT_SMALL, getText("UI_characreation_hairtype"), self, showMenu)
+		self.hairMenuButton:initialise()
+		self.hairMenuButton:instantiate()
+		self.characterPanel:addChild(self.hairMenuButton)
+
+		self.yOffset = self.yOffset + self.hairMenuButton:getHeight() + 5;
+	else
+		self.characterPanel:addChild(self.hairMenu)
+		self.yOffset = self.yOffset + self.hairMenu:getHeight() + 5;
+	end
+	
 	
 	local xColor = 90;
 	local fontHgt = FONT_HGT_SMALL
@@ -231,7 +259,7 @@ end
 function CharacterCreationMain:createBeardTypeBtn()
 	local comboHgt = FONT_HGT_SMALL + 3 * 2
 
-	local avatar_size, grid_size = get_menu_parameters()
+	local low_res = get_menu_parameters()
 	
 	self.beardLbl = ISLabel:new(self.xOffset, self.yOffset, FONT_HGT_MEDIUM, getText("UI_characreation_beard"), 1, 1, 1, 1, UIFont.Medium, true);
 	self.beardLbl:initialise();
@@ -260,9 +288,21 @@ function CharacterCreationMain:createBeardTypeBtn()
 	self.beardTypeCombo:setVisible(false);
 	self.characterPanel:addChild(self.beardTypeCombo)
 
-	self.beardMenu = HairMenuPanel:new(self.xOffset, self.yOffset, avatar_size,avatar_size, 1,grid_size.cols, 3, true)
-	self.beardMenu:initialise()
-	self.beardMenu:setDesc(MainScreen.instance.desc)
+
+	--The following is copied from above, it only appears in these two places so I'm not making it a function
+
+	local panelType = nil
+	local beard_rows = 1
+
+	if low_res == true then
+		panelType = HairMenuPanelModal
+		beard_rows = 2
+	else
+		panelType = HairMenuPanel
+		beard_rows = 1
+	end
+
+	self.beardMenu = panelType:new(self.xOffset, self.yOffset, avatar_size,avatar_size, beard_rows,3, 3, true)
 	self.beardMenu.onSelect = function(select_name)
 		for i=1,#self.beardTypeCombo.options do
 			local name = self.beardTypeCombo:getOptionData(i):lower()
@@ -273,9 +313,33 @@ function CharacterCreationMain:createBeardTypeBtn()
 			end
 		end
 	end
-	self.characterPanel:addChild(self.beardMenu)
+	self.beardMenu:initialise()
+	self.beardMenu:setDesc(MainScreen.instance.desc)
+	
+	if low_res == true then
+		local function showMenu(target)
+			target:removeChild(target.beardMenu)
+			target:addChild(target.beardMenu)
+			target.beardMenu:setX( (target:getWidth()/2) - (target.beardMenu:getWidth()/2) )
+			target.beardMenu:setY( (target:getHeight()/2) - (target.beardMenu:getHeight()/2) )
+			target.beardMenu:setCapture(true)
+		end
 
-	self.yOffset = self.yOffset + self.hairMenu:getHeight() + 5;
+		self.beardMenu.onClose = function()
+			self:removeChild(self.beardMenu)
+			self.beardMenu:setCapture(false)
+		end
+
+		self.beardMenuButton = ISButton:new(self.xOffset, self.yOffset, 45, FONT_HGT_SMALL, getText("UI_characreation_beardtype"), self, showMenu)
+		self.beardMenuButton:initialise()
+		self.beardMenuButton:instantiate()
+		self.characterPanel:addChild(self.beardMenuButton)
+
+		self.yOffset = self.yOffset + self.beardMenuButton:getHeight() + 5;
+	else
+		self.characterPanel:addChild(self.beardMenu)
+		self.yOffset = self.yOffset + self.beardMenu:getHeight() + 5;
+	end
 end
 
 local base_CharacterCreationMain_onBeardTypeSelected = CharacterCreationMain.onBeardTypeSelected
