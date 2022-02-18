@@ -18,6 +18,9 @@ function HairAvatar:new(x, y, width, height, isBeard)
 	o.char = nil
 	o.onSelect = nil
 	o.avatarBackgroundTexture = getTexture("media/ui/avatarBackground.png")
+	o.texture_scissors = getTexture("media/ui/Scissors.png")
+	o.texture_razor    = getTexture("media/ui/Razor.png")
+	o.texture_gel      = getTexture("media/ui/HairGel.png")
 	o.isBeard = isBeard
 	-- o.tickTexture = getTexture("Quest_Succeed")
 	-- o.crossTexture = getTexture("Quest_Failed");
@@ -40,16 +43,22 @@ function HairAvatar:prerender()
 	self:drawTextureScaled(self.avatarBackgroundTexture, 0, 0, self.width, self.height, 1, 1, 1, 1)
 end
 
--- function HairAvatar:render()
--- 	base.render(self)
--- 	if self.drawIcon then
--- 		if self.drawIcon == "tick" then
--- 			self:drawTexture(self.tickTexture, self:getRight(), 0, 1, 1, 1, 1);
--- 		elseif self.drawIcon == "cross" then
--- 			self:drawTexture(self.crossTexture, self:getRight(), 0, 1, 1, 1, 1);
--- 		end
--- 	end
--- end
+function HairAvatar:render()
+	base.render(self)
+	if self.requirements then
+		local x_pos = self:getWidth()-20
+		local y_pos = 0
+		local size = 20
+		if self.requirements == "scissors" then
+			self:drawTextureScaled(self.texture_scissors, x_pos,y_pos, size,size, 1, 1, 0.5, 0.5);
+		elseif self.requirements == "scissorsrazor" then
+			self:drawTextureScaled(self.texture_scissors, x_pos,y_pos, size,size, 1, 1, 0.5, 0.5);
+			self:drawTextureScaled(self.texture_razor, x_pos,y_pos+20, size,size, 1, 1, 0.5, 0.5);
+		elseif self.requirements == "hairgel" then
+			self:drawTextureScaled(self.texture_gel, x_pos,y_pos, size,size, 1, 1, 0.5, 0.5);
+		end
+	end
+end
 
 function HairAvatar:onMouseMove(dx, dy)
 	-- This is mostly repeated but it preserves the vanilla code
@@ -95,9 +104,10 @@ function HairAvatar:setChar(char)
 	self.desc = nil
 end
 
-function HairAvatar:setHair(id, display)
+function HairAvatar:setHair(id, display, requirements)
 	self.hair_id = id
 	self.hair_display = display
+	self.requirements = requirements
 end
 
 function HairAvatar:applyHair()

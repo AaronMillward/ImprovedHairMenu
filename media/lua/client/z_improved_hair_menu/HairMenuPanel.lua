@@ -176,7 +176,8 @@ function HairMenuPanel:showPage(page_number)
 		if self.pages[page_number][i] == "DISABLED" then 
 			self.avatarList[i]:setVisible(false)
 		else
-			self.avatarList[i]:setHair(self.pages[page_number][i].id, self.pages[page_number][i].display)
+			local hair_data = self.pages[page_number][i]
+			self.avatarList[i]:setHair(hair_data.id, hair_data.display, hair_data.requirements)
 			self.avatarList[i]:applyHair()
 			self.avatarList[i]:setVisible(true)
 		end

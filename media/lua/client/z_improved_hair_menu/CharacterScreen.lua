@@ -31,7 +31,6 @@ function HairMenuPanelWindow:createChildren()
 	self.hairPanel:setChar(self.char)
 	self.hairPanel.onSelect = function(select_name)
 		self.onSelect(select_name)
-		self:close()
 	end
 	self.hairPanel:setHairList(self.hairlist)
 	self:addChild(self.hairPanel)
@@ -91,9 +90,7 @@ function ISCharacterScreen:hairMenu(button)
 			end
 
 			if insert_into then
-				if v.notAvailable == nil or v.notAvailable == false then
-					table.insert(insert_into, v)
-				end
+				table.insert(insert_into, v)
 				table.insert(delete_options, k)
 			end
 		end
@@ -101,9 +98,7 @@ function ISCharacterScreen:hairMenu(button)
 
 	replace_context_menu(context, button, delete_options)
 
-	if #hair_options_cut > 0 then
-		context:addOption(cuthair_text, player, ihm_open_hair_menu, hair_options_cut, cuthair_text, false)
-	end
+	context:addOption(cuthair_text, player, ihm_open_hair_menu, hair_options_cut, cuthair_text, false)
 	if #hair_options_tie > 0 then
 		context:addOption(tiehair_text, player, ihm_open_hair_menu, hair_options_tie, tiehair_text, false)
 	end
@@ -145,12 +140,27 @@ function ISCharacterScreen:beardMenu(button)
 	end
 end
 
+local Tooltip_requireRazorOrScissors = getText("Tooltip_requireRazorOrScissors")
+local Tooltip_RequireScissors        = getText("Tooltip_RequireScissors")
+local Tooltip_requireHairGel         = getText("Tooltip_requireHairGel")
+
+local opened_menu = nil
+
 function ihm_open_hair_menu(player, hair_options, title, isbeard)
 	local hairlist = {}
 	for k,v in ipairs(hair_options) do
 		local info = {}
 		info.id = v.param1
-		info.display = string.gsub(v.name,title,"") 
+		info.display = string.gsub(v.name,title,"")
+		if v.toolTip then
+			if v.toolTip.description == Tooltip_RequireScissors then
+				info.requirements = "scissors"
+			elseif v.toolTip.description == Tooltip_requireRazorOrScissors then
+				info.requirements = "scissorsrazor"
+			elseif v.toolTip.description == Tooltip_requireHairGel then
+				info.requirements = "hairgel"
+			end
+		end
 		table.insert(hairlist, info)
 	end
 
@@ -158,11 +168,20 @@ function ihm_open_hair_menu(player, hair_options, title, isbeard)
 	menu.onSelect = function(selection)
 		for k,v in ipairs(hair_options) do
 			if v.param1 == selection then
-				v.onSelect(v.target, v.param1, v.param2, v.param3, v.param4, v.param5, v.param6, v.param7, v.param8, v.param9, v.param10)
+				if v.notAvailable ~= true then
+					v.onSelect(v.target, v.param1, v.param2, v.param3, v.param4, v.param5, v.param6, v.param7, v.param8, v.param9, v.param10)
+					menu:close()
+					opened_menu = nil
+				end
 			end
 		end
 	end
 	menu:initialise()
 	menu.title = title
 	menu:addToUIManager()
+
+	if opened_menu ~= nil then
+		opened_menu:close()
+	end
+	opened_menu = menu
 end
