@@ -2,8 +2,6 @@
 	Here we intergrate the HairMenuPanel into the character creation menu.
 ]]
 
-require("HairMenuPanel")
-
 local FONT_HGT_SMALL = getTextManager():getFontHeight(UIFont.Small)
 local FONT_HGT_MEDIUM = getTextManager():getFontHeight(UIFont.Medium)
 
