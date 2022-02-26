@@ -19,10 +19,10 @@ function HairMenuPanel:render()
 	local x_off = self.pageRightButton:getRight()
 
 	x_off = x_off + 10
-	self:drawText(self.page_current .. "/" .. #self.pages, x_off, height/2, 0.9, 0.9, 0.9, 0.9, UIFont.Small)
+	self:drawText(self.pageCurrent .. "/" .. #self.pages, x_off, height/2, 0.9, 0.9, 0.9, 0.9, UIFont.Small)
 
 	x_off = x_off + 40
-	self:drawText(self.selected_display, x_off, height/2, 0.9, 0.9, 0.9, 0.9, UIFont.Small)
+	self:drawText(self.selectedDisplay, x_off, height/2, 0.9, 0.9, 0.9, 0.9, UIFont.Small)
 
 end
 
@@ -34,17 +34,17 @@ function HairMenuPanel:new(x, y, size_x, size_y, rows, cols, gap, isBeard)
 	gap    = gap or 3
 
 	local o = base.new(self, x, y, (size_x * cols) + (gap * (cols-1)) , (size_y * rows) + (gap * (rows-1)) + header_height)
-	o.hair_size_x = size_x
-	o.hair_size_y = size_y
-	o.hair_rows   = rows
-	o.hair_cols   = cols
-	o.hair_page_size = (rows * cols)
+	o.gridSizeX = size_x
+	o.gridSizeY = size_y
+	o.gridRows   = rows
+	o.gridCols   = cols
+	o.pageSize = (rows * cols)
 	o.gap = gap
 	o.avatarList = {}
 	o.pages = {}
-	o.page_current = 1
+	o.pageCurrent = 1
 	o.onSelect = nil
-	o.selected_display = ""
+	o.selectedDisplay = ""
 	o.isBeard = isBeard
 	o.showNameOnHover = false
 	return o
@@ -74,19 +74,19 @@ function HairMenuPanel:initialise()
 	--this is to reduce the number of 3d models by loading the hairs onto these avatars when switching pages
 
 	self.offset_y = self.offset_y + 20
-	for h=1,self.hair_rows do
-		for v=1,self.hair_cols do
-			local idx = ((h-1)*self.hair_cols) + v
+	for h=1,self.gridRows do
+		for v=1,self.gridCols do
+			local idx = ((h-1)*self.gridCols) + v
 			
-			local x = ((v-1) * self.hair_size_x) + (self.gap*(v-1))
-			local y = (self.offset_y + ((h-1) * self.hair_size_y)) + (self.gap*(h-1))
-			local hairAvatar = HairAvatar:new(x, y, self.hair_size_x, self.hair_size_y, self.isBeard)
+			local x = ((v-1) * self.gridSizeX) + (self.gap*(v-1))
+			local y = (self.offset_y + ((h-1) * self.gridSizeY)) + (self.gap*(h-1))
+			local hairAvatar = HairAvatar:new(x, y, self.gridSizeX, self.gridSizeY, self.isBeard)
 			hairAvatar:initialise()
 			hairAvatar:instantiate()
 			hairAvatar:setVisible(true)
 			hairAvatar.onSelect = function(hairAvatar)
-				self.selected_display = hairAvatar.hair_display
-				if self.onSelect then self.onSelect(hairAvatar.hair_id) end
+				self.selectedDisplay = hairAvatar.hairInfo.display
+				if self.onSelect then self.onSelect(hairAvatar.hairInfo.id) end
 			end
 			local old_onMouseMove = hairAvatar.onMouseMove
 			hairAvatar.onMouseMove = function(avatar, x, y)
@@ -96,7 +96,7 @@ function HairMenuPanel:initialise()
 					local x = self:getMouseX()
 					local y = self:getMouseY()
 					if avatar:containsPoint(x,y) then
-						self.selected_display = avatar.hair_display
+						self.selectedDisplay = avatar.hairInfo.display
 					end
 				end
 			end
@@ -106,18 +106,12 @@ function HairMenuPanel:initialise()
 		end
 	end
 
-	self.offset_y = self.offset_y + (self.hair_rows * self.hair_size_y) + (self.gap * (self.hair_rows-1))
+	self.offset_y = self.offset_y + (self.gridRows * self.gridSizeY) + (self.gap * (self.gridRows-1))
 end
 
-function HairMenuPanel:setDesc(desc)
+function HairMenuPanel:setModelData(data)
 	for i=1,#self.avatarList do
-		self.avatarList[i]:setDesc(desc)
-	end
-end
-
-function HairMenuPanel:setChar(desc)
-	for i=1,#self.avatarList do
-		self.avatarList[i]:setChar(desc)
+		self.avatarList[i]:setModelData(data)
 	end
 end
 
@@ -133,51 +127,51 @@ function HairMenuPanel:setHairList(list)
 	self.pages[page_no] = {}
 
 	for i=1,#list do
-		adj_i = i - ((page_no-1) * self.hair_page_size)
+		adj_i = i - ((page_no-1) * self.pageSize)
 		
-		if adj_i > self.hair_page_size then
+		if adj_i > self.pageSize then
 			page_no = page_no + 1
 			self.pages[page_no] = {}
-			adj_i = i - ((page_no-1) * self.hair_page_size)
+			adj_i = i - ((page_no-1) * self.pageSize)
 		end
 		
 		self.pages[page_no][adj_i] = list[i]
 	end
 
-	if #self.pages[page_no] < self.hair_page_size then
-		for i=#self.pages[page_no]+1,self.hair_page_size do
+	if #self.pages[page_no] < self.pageSize then
+		for i=#self.pages[page_no]+1,self.pageSize do
 			self.pages[page_no][i] = "DISABLED"
 		end
 	end
 
-	if self.page_current > #self.pages then 
-		self.page_current = #self.pages
+	if self.pageCurrent > #self.pages then 
+		self.pageCurrent = #self.pages
 	end
-	self:showPage(self.page_current)
+	self:showPage(self.pageCurrent)
 end
 
 function HairMenuPanel:onChangePage(button,x,y)
 	if button.internal == "NEXT" then 
-		self.page_current = self.page_current + 1
+		self.pageCurrent = self.pageCurrent + 1
 	elseif button.internal == "PREV" then 
-		self.page_current = self.page_current - 1
+		self.pageCurrent = self.pageCurrent - 1
 	end
 
-	if self.page_current > #self.pages then self.page_current = #self.pages end
-	if self.page_current < 1 then self.page_current = 1 end
+	if self.pageCurrent > #self.pages then self.pageCurrent = #self.pages end
+	if self.pageCurrent < 1 then self.pageCurrent = 1 end
 
-	self:showPage(self.page_current)
+	self:showPage(self.pageCurrent)
 end
 
 function HairMenuPanel:showPage(page_number)
 	if #self.pages < 1 then return end
 
-	for i=1,self.hair_page_size do
+	for i=1,self.pageSize do
 		if self.pages[page_number][i] == "DISABLED" then 
 			self.avatarList[i]:setVisible(false)
 		else
 			local hair_data = self.pages[page_number][i]
-			self.avatarList[i]:setHair(hair_data.id, hair_data.display, hair_data.requirements)
+			self.avatarList[i]:setHairInfo(hair_data)
 			self.avatarList[i]:applyHair()
 			self.avatarList[i]:setVisible(true)
 		end

@@ -167,7 +167,7 @@ function CharacterCreationMain:createHairTypeBtn()
 		end
 	end
 	self.hairMenu:initialise()
-	self.hairMenu:setDesc(MainScreen.instance.desc)
+	self.hairMenu:setModelData(MainScreen.instance.desc)
 	
 	if low_res == true then
 		local function showMenu(target)
@@ -314,7 +314,7 @@ function CharacterCreationMain:createBeardTypeBtn()
 		end
 	end
 	self.beardMenu:initialise()
-	self.beardMenu:setDesc(MainScreen.instance.desc)
+	self.beardMenu:setModelData(MainScreen.instance.desc)
 	
 	if low_res == true then
 		local function showMenu(target)
