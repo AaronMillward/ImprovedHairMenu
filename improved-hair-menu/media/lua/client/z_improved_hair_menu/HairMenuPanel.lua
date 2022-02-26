@@ -3,9 +3,6 @@
 	By being a separate UI element it can be implemented in both the character creation menu and in-game hair options.
 ]]
 
-
-require("HairAvatar")
-
 local FONT_HGT_SMALL = getTextManager():getFontHeight(UIFont.Small)
 local FONT_HGT_MEDIUM = getTextManager():getFontHeight(UIFont.Medium)
 local header_height = FONT_HGT_SMALL + 14
