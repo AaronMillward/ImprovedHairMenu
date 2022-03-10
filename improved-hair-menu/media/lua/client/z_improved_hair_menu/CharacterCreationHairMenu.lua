@@ -79,8 +79,10 @@ local function get_menu_parameters()
 	--[[
 		786 is what I've seen in a lot of vanilla code,
 		I'm not certain of its significance but I think it's a common laptop resolution
+
+		2022-03-10 Changed to 900 - Someone said the beard menu still appears offscreen at 900px resolution
 	]]
-	return (getCore():getScreenHeight() <= 768) 
+	return (getCore():getScreenHeight() <= 900)
 end
 
 --[[
