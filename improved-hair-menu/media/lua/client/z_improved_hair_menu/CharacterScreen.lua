@@ -28,7 +28,7 @@ function HairMenuPanelWindow:createChildren()
 	self.hairPanel = HairMenuPanel:new(0,th, 96,96, 2,3, 3, self.isbeard)
 	self.hairPanel.showNameOnHover = true
 	self.hairPanel:initialise()
-	self.hairPanel:setModelData(self.char)
+	self.hairPanel:setChar(self.char)
 	self.hairPanel.onSelect = function(select_name)
 		self.onSelect(select_name)
 	end

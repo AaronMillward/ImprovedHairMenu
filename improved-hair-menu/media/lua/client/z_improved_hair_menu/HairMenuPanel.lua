@@ -106,9 +106,15 @@ function HairMenuPanel:initialise()
 	self.offset_y = self.offset_y + (self.gridRows * self.gridSizeY) + (self.gap * (self.gridRows-1))
 end
 
-function HairMenuPanel:setModelData(data)
+function HairMenuPanel:setDesc(desc)
 	for i=1,#self.avatarList do
-		self.avatarList[i]:setModelData(data)
+		self.avatarList[i]:setDesc(desc)
+	end
+end
+
+function HairMenuPanel:setChar(desc)
+	for i=1,#self.avatarList do
+		self.avatarList[i]:setChar(desc)
 	end
 end
 
