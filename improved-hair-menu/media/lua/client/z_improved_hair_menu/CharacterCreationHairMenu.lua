@@ -30,13 +30,17 @@ end
 --To reduce vanilla mods we use the comboboxes to get and select hair styles
 local base_CharacterCreationMain_disableBtn = CharacterCreationMain.disableBtn
 function CharacterCreationMain:disableBtn()
-	base_CharacterCreationMain_disableBtn(self)
+	--[[ 
+		When the game updates disableBtn will break due to elements changing causing calls to nil in disableBtn.
+		If we catch the error here, it will not propegate and break the whole main menu.
+	 ]]
+	pcall(base_CharacterCreationMain_disableBtn, self)
 
 	--Base sets these depending on gender, we don't need them at all.
-	if self.beardTypeLbl and self.beardTypeCombo then
-		self.beardTypeLbl:setVisible(false)
-		self.beardTypeCombo:setVisible(false)
-	end
+	if self.beardTypeLbl    then self.beardTypeLbl:setVisible(false)    end
+	if self.beardTypeCombo  then self.beardTypeCombo:setVisible(false)  end
+	if self.hairStubbleLbl  then self.hairStubbleLbl:setVisible(false)  end
+	if self.beardStubbleLbl then self.beardStubbleLbl:setVisible(false) end
 
 	if self.hairTypeCombo and self.hairMenu then
 		local hairs = {}
@@ -196,7 +200,6 @@ function CharacterCreationMain:createHairTypeBtn()
 	
 	
 	local xColor = 90;
-	local fontHgt = FONT_HGT_SMALL
 	
 	local hairColors = MainScreen.instance.desc:getCommonHairColor();
 	local hairColors1 = {}
@@ -208,8 +211,7 @@ function CharacterCreationMain:createHairTypeBtn()
 		--		info:desaturate(0.5)
 		table.insert(hairColors1, { r=info:getR(), g=info:getG(), b=info:getB() })
 	end
-	-- local hairColorBtn = ISButton:new(self.xOffset+xColor, self.yOffset, 45, fontHgt, "", self, CharacterCreationMain.onHairColorMouseDown)
-	local hairColorBtn = ISButton:new(self.hairMenu:getWidth() - 55, fontHgt/2 , 45, fontHgt, "", self, CharacterCreationMain.onHairColorMouseDown)
+	local hairColorBtn = ISButton:new(self.hairMenu:getWidth() - 55, FONT_HGT_SMALL/2 , 45, FONT_HGT_SMALL, "", self, CharacterCreationMain.onHairColorMouseDown)
 
 	hairColorBtn:initialise()
 	hairColorBtn:instantiate()
@@ -237,6 +239,21 @@ function CharacterCreationMain:createHairTypeBtn()
 		colorPickerHair_picked2(self, hide)
 		self:setCapture(false)
 	end
+
+	-- ----------------------
+	-- -- STUBBLE
+	-- ----------------------
+	self.hairStubbleLbl = ISLabel:new(self.xOffset, self.yOffset + FONT_HGT_SMALL, comboHgt, getText("UI_Stubble"), 1, 1, 1, 1, UIFont.Small);
+	self.hairStubbleLbl:initialise();
+	self.hairStubbleLbl:instantiate();
+	self.characterPanel:addChild(self.hairStubbleLbl);
+	self.yOffset = self.yOffset + FONT_HGT_SMALL
+
+	self.hairStubbleTickBox = ISTickBox:new(self.hairMenu:getWidth() - 55 - FONT_HGT_SMALL - 8, comboHgt/4, FONT_HGT_SMALL-2, FONT_HGT_SMALL-2, "", self, CharacterCreationMain.onShavedHairSelected);
+	self.hairStubbleTickBox:initialise()
+	self.hairStubbleTickBox:addOption("")
+	self.hairStubbleTickBox.tooltip = getText("UI_Stubble")
+	self.hairMenu:addChild(self.hairStubbleTickBox)
 end
 
 local base_CharacterCreationMain_onHairColorMouseDown = CharacterCreationMain.onHairColorMouseDown
@@ -340,6 +357,22 @@ function CharacterCreationMain:createBeardTypeBtn()
 		self.characterPanel:addChild(self.beardMenu)
 		self.yOffset = self.yOffset + self.beardMenu:getHeight() + 5;
 	end
+
+	----------------------
+	-- STUBBLE
+	----------------------
+	self.beardStubbleLbl = ISLabel:new(self.xOffset+70, self.yOffset, comboHgt, getText("UI_Stubble"), 1, 1, 1, 1, UIFont.Small);
+	self.beardStubbleLbl:initialise();
+	self.beardStubbleLbl:instantiate();
+	self.characterPanel:addChild(self.beardStubbleLbl);
+
+	self.beardStubbleTickBox = ISTickBox:new(self.beardMenu:getWidth() - FONT_HGT_SMALL - 10, comboHgt/4, FONT_HGT_SMALL-2, FONT_HGT_SMALL-2, "", self, CharacterCreationMain.onBeardStubbleSelected);
+	self.beardStubbleTickBox:initialise()
+	self.beardStubbleTickBox:addOption("")
+	self.beardStubbleTickBox.tooltip = getText("UI_Stubble")
+	self.beardMenu:addChild(self.beardStubbleTickBox)
+
+	self.yOffset = self.yOffset + comboHgt + 10;
 end
 
 local base_CharacterCreationMain_onBeardTypeSelected = CharacterCreationMain.onBeardTypeSelected

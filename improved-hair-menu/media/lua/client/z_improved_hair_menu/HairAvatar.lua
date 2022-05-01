@@ -41,7 +41,7 @@ function HairAvatar:render()
 			self:drawTextureScaled(texture_scissors, x_pos,y_pos, size,size, 1, 1, 0.5, 0.5);
 		elseif self.hairInfo.requirements == "scissorsrazor" then
 			self:drawTextureScaled(texture_scissors, x_pos,y_pos, size,size, 1, 1, 0.5, 0.5);
-			self:drawTextureScaled(texture_razor, x_pos,y_pos+20, size,size, 1, 1, 0.5, 0.5);
+			self:drawTextureScaled(texture_razor, x_pos,y_pos+size, size,size, 1, 1, 0.5, 0.5);
 		elseif self.hairInfo.requirements == "hairgel" then
 			self:drawTextureScaled(texture_gel, x_pos,y_pos, size,size, 1, 1, 0.5, 0.5);
 		end
