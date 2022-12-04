@@ -1,0 +1,12 @@
+IGUI_EN = {
+	IGUI_IHM_use_modal = "Use Modal Dialog"
+	IGUI_IHM_use_modal_tooltip = "Replaces the inline menu with a popout. This can also be useful for low resolution monitors."
+	IGUI_IHM_avatar_size = "Avatar Size"
+	IGUI_IHM_avatar_size_tooltip = "Pixel size of each element in the menu."
+	IGUI_IHM_hair_rows = "Inline Hair Menu Rows"
+	IGUI_IHM_hair_cols = "Inline Hair Menu Columns"
+	IGUI_IHM_beard_rows = "Inline Beard Menu Rows"
+	IGUI_IHM_beard_cols = "Inline Beard Menu Columns"
+	IGUI_IHM_modal_rows = "Modal Dialog Rows"
+	IGUI_IHM_modal_cols = "Modal Dialog Columns"
+}

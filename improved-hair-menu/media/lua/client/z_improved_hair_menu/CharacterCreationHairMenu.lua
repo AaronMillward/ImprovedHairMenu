@@ -77,9 +77,7 @@ end
 --## Hair Styles ##
 --#################
 
-local avatar_size = 96
-
-local function get_menu_parameters()
+local function is_low_res()
 	--[[
 		786 is what I've seen in a lot of vanilla code,
 		I'm not certain of its significance but I think it's a common laptop resolution
@@ -102,8 +100,9 @@ end
 		We do this to stop click through selecting different hairs under the color picker
 ]]
 function CharacterCreationMain:createHairTypeBtn()
-	local low_res = get_menu_parameters()
-
+	--XXX: Should low res users be forced to use modal?
+	local use_modal = ImprovedHairMenu.settings.use_modal == true or is_low_res()
+	local avatar_size = ImprovedHairMenu.settings:get_avatar_size()
 	local comboHgt = FONT_HGT_SMALL + 3 * 2
 	
 	local lbl = ISLabel:new(self.xOffset, self.yOffset, FONT_HGT_MEDIUM, getText("UI_characreation_hair"), 1, 1, 1, 1, UIFont.Medium, true);
@@ -126,16 +125,17 @@ function CharacterCreationMain:createHairTypeBtn()
 	self.hairType = 0
 	--Don't increment the y offset here, the combo is invisible and the menu takes its place
 
-
 	local panelType = nil
 
-	if low_res == true then
+	if use_modal then
 		panelType = HairMenuPanelModal
 	else
 		panelType = HairMenuPanel
 	end
 
-	self.hairMenu = panelType:new(self.xOffset, self.yOffset, avatar_size,avatar_size, 2,3, 3, false)
+	local menu_size = ImprovedHairMenu.settings:get_menu_size(false)
+
+	self.hairMenu = panelType:new(self.xOffset, self.yOffset, avatar_size,avatar_size, menu_size.cols,menu_size.rows, 3, false)
 	self.hairMenu.onSelect = function(select_name)
 		for i=1,#self.hairTypeCombo.options do
 			local name = self.hairTypeCombo:getOptionData(i):lower()
@@ -173,7 +173,7 @@ function CharacterCreationMain:createHairTypeBtn()
 	self.hairMenu:initialise()
 	self.hairMenu:setDesc(MainScreen.instance.desc)
 	
-	if low_res == true then
+	if use_modal then
 		local function showMenu(target)
 			target:removeChild(target.hairMenu)
 			target:addChild(target.hairMenu)
@@ -187,7 +187,7 @@ function CharacterCreationMain:createHairTypeBtn()
 			self.hairMenu:setCapture(false)
 		end
 
-		self.hairMenuButton = ISButton:new(self.xOffset, self.yOffset, 45, FONT_HGT_SMALL, getText("UI_characreation_hairtype"), self, showMenu)
+		self.hairMenuButton = ISButton:new(self.xOffset, self.yOffset, 90, FONT_HGT_SMALL*2, getText("IGUI_Open"), self, showMenu)
 		self.hairMenuButton:initialise()
 		self.hairMenuButton:instantiate()
 		self.characterPanel:addChild(self.hairMenuButton)
@@ -275,8 +275,8 @@ end
 
 function CharacterCreationMain:createBeardTypeBtn()
 	local comboHgt = FONT_HGT_SMALL + 3 * 2
-
-	local low_res = get_menu_parameters()
+	local use_modal = ImprovedHairMenu.settings.use_modal == true or is_low_res()
+	local avatar_size = ImprovedHairMenu.settings:get_avatar_size()
 	
 	self.beardLbl = ISLabel:new(self.xOffset, self.yOffset, FONT_HGT_MEDIUM, getText("UI_characreation_beard"), 1, 1, 1, 1, UIFont.Medium, true);
 	self.beardLbl:initialise();
@@ -309,17 +309,13 @@ function CharacterCreationMain:createBeardTypeBtn()
 	--The following is copied from above, it only appears in these two places so I'm not making it a function
 
 	local panelType = nil
-	local beard_rows = 1
-
-	if low_res == true then
+	if use_modal then
 		panelType = HairMenuPanelModal
-		beard_rows = 2
 	else
 		panelType = HairMenuPanel
-		beard_rows = 1
 	end
-
-	self.beardMenu = panelType:new(self.xOffset, self.yOffset, avatar_size,avatar_size, beard_rows,3, 3, true)
+	local menu_size = ImprovedHairMenu.settings:get_menu_size(true)
+	self.beardMenu = panelType:new(self.xOffset, self.yOffset, avatar_size,avatar_size, menu_size.cols,menu_size.rows, 3, true)
 	self.beardMenu.onSelect = function(select_name)
 		for i=1,#self.beardTypeCombo.options do
 			local name = self.beardTypeCombo:getOptionData(i):lower()
@@ -333,7 +329,7 @@ function CharacterCreationMain:createBeardTypeBtn()
 	self.beardMenu:initialise()
 	self.beardMenu:setDesc(MainScreen.instance.desc)
 	
-	if low_res == true then
+	if use_modal then
 		local function showMenu(target)
 			target:removeChild(target.beardMenu)
 			target:addChild(target.beardMenu)
@@ -347,7 +343,7 @@ function CharacterCreationMain:createBeardTypeBtn()
 			self.beardMenu:setCapture(false)
 		end
 
-		self.beardMenuButton = ISButton:new(self.xOffset, self.yOffset, 45, FONT_HGT_SMALL, getText("UI_characreation_beardtype"), self, showMenu)
+		self.beardMenuButton = ISButton:new(self.xOffset, self.yOffset, 90, FONT_HGT_SMALL*2, getText("IGUI_Open"), self, showMenu)
 		self.beardMenuButton:initialise()
 		self.beardMenuButton:instantiate()
 		self.characterPanel:addChild(self.beardMenuButton)
