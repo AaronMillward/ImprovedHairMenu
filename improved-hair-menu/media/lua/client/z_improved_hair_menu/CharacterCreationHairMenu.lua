@@ -42,12 +42,14 @@ function CharacterCreationMain:disableBtn()
 	if self.hairStubbleLbl  then self.hairStubbleLbl:setVisible(false)  end
 	if self.beardStubbleLbl then self.beardStubbleLbl:setVisible(false) end
 
-	if self.hairTypeCombo and self.hairMenu then
+	-- Check if hairInfo is already present, we don't want to regenerate it as it holds data about the selection
+	if self.hairTypeCombo and self.hairMenu and not self.hairMenu.hasInfo then
 		local hairs = {}
 		for i=1,#self.hairTypeCombo.options do
 			local info = {}
 			info.id = self.hairTypeCombo:getOptionData(i):lower()
 			info.display = self.hairTypeCombo:getOptionText(i)
+			info.selected = false
 	
 			table.insert(hairs, info)
 		end
@@ -55,7 +57,7 @@ function CharacterCreationMain:disableBtn()
 		self.hairMenu:setHairList(hairs)
 	end
 
-	if self.beardTypeCombo and self.beardMenu then
+	if self.beardTypeCombo and self.beardMenu and not self.beardMenu.hasInfo then
 		local vis = not MainScreen.instance.desc:isFemale()
 		self.beardMenu:setVisible(vis)
 		if self.beardMenuButton then self.beardMenuButton:setVisible(vis) end
@@ -65,6 +67,7 @@ function CharacterCreationMain:disableBtn()
 				local info = {}
 				info.id = self.beardTypeCombo:getOptionData(i):lower()
 				info.display = self.beardTypeCombo:getOptionText(i)
+				info.selected = false
 		
 				table.insert(hairs, info)
 			end
@@ -219,6 +222,7 @@ function CharacterCreationMain:createHairTypeBtn()
 	hairColorBtn.backgroundColor = {r=color.r, g=color.g, b=color.b, a=1}
 	-- self.characterPanel:addChild(hairColorBtn)
 	self.hairMenu:addChild(hairColorBtn)
+	self.hairMenu.hairColorBtn = hairColorBtn
 	self.hairColorButton = hairColorBtn
 	
 	self.colorPickerHair = ISColorPicker:new(0, 0, nil)
@@ -254,6 +258,7 @@ function CharacterCreationMain:createHairTypeBtn()
 	self.hairStubbleTickBox:addOption("")
 	self.hairStubbleTickBox.tooltip = getText("UI_Stubble")
 	self.hairMenu:addChild(self.hairStubbleTickBox)
+	self.hairMenu.stubbleTickBox = self.hairStubbleTickBox
 end
 
 local base_CharacterCreationMain_onHairColorMouseDown = CharacterCreationMain.onHairColorMouseDown
@@ -367,6 +372,7 @@ function CharacterCreationMain:createBeardTypeBtn()
 	self.beardStubbleTickBox:addOption("")
 	self.beardStubbleTickBox.tooltip = getText("UI_Stubble")
 	self.beardMenu:addChild(self.beardStubbleTickBox)
+	self.beardMenu.stubbleTickBox = self.beardStubbleTickBox
 
 	self.yOffset = self.yOffset + comboHgt + 10;
 end

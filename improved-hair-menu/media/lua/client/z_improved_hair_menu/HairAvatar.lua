@@ -14,10 +14,11 @@ HairAvatar = base:derive("HairAvatar")
 
 function HairAvatar:new(x, y, width, height, isBeard)
 	local o = base.new(self, x, y, width, height)
-	o.hairInfo = {id = "HAIR_UNINITIALIZED", display = "HAIR_UNINITIALIZED"}
+	o.hairInfo = {id = "HAIR_UNINITIALIZED", display = "HAIR_UNINITIALIZED", selected = false}
 	o.desc = nil
 	o.char = nil
 	o.isBeard = isBeard
+	o.cursor = false
 	return o
 end
 
@@ -46,6 +47,8 @@ function HairAvatar:render()
 			self:drawTextureScaled(texture_gel, x_pos,y_pos, size,size, 1, 1, 0.5, 0.5);
 		end
 	end
+	if self.hairInfo.selected == true then self:drawRectBorder(0, 0, self.width, self.height, 0.5,0,1,0) end
+	if (not self.hairInfo.selected) and self.cursor then self:drawRectBorder(0, 0, self.width, self.height, 0.5,1,1,1) end
 end
 
 function HairAvatar:setDesc(desc)

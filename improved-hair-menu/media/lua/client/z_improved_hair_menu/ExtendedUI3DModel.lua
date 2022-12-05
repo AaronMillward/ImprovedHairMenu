@@ -49,5 +49,5 @@ function ISUI3DModelExt:onMouseUpOutside(x, y)
 end
 
 function ISUI3DModelExt:onSelect() 
-	self.onSelect(self)
+	if self.onSelect then self.onSelect(self) end
 end

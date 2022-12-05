@@ -7,7 +7,7 @@ local FONT_HGT_SMALL = getTextManager():getFontHeight(UIFont.Small)
 local FONT_HGT_MEDIUM = getTextManager():getFontHeight(UIFont.Medium)
 local header_height = FONT_HGT_SMALL + 14
 
-local base = ISPanel
+local base = ISPanelJoypad
 HairMenuPanel = base:derive("HairMenuPanel")
 
 function HairMenuPanel:render()
@@ -19,7 +19,8 @@ function HairMenuPanel:render()
 	self:drawText(self.pageCurrent .. "/" .. #self.pages, x_off, height/2, 0.9, 0.9, 0.9, 0.9, UIFont.Small)
 
 	x_off = x_off + 40
-	self:drawText(self.selectedDisplay, x_off, height/2, 0.9, 0.9, 0.9, 0.9, UIFont.Small)
+
+	self:drawText(self.selectedHairInfo.display or "", x_off, height/2, 0.9, 0.9, 0.9, 0.9, UIFont.Small)
 
 end
 
@@ -31,6 +32,7 @@ function HairMenuPanel:new(x, y, size_x, size_y, rows, cols, gap, isBeard)
 	gap    = gap or 3
 
 	local o = base.new(self, x, y, (size_x * cols) + (gap * (cols-1)) , (size_y * rows) + (gap * (rows-1)) + header_height)
+	o.isHairMenu = true -- Used by panels to determine type for passing in events
 	o.gridSizeX = size_x
 	o.gridSizeY = size_y
 	o.gridRows   = rows
@@ -38,12 +40,14 @@ function HairMenuPanel:new(x, y, size_x, size_y, rows, cols, gap, isBeard)
 	o.pageSize = (rows * cols)
 	o.gap = gap
 	o.avatarList = {}
-	o.pages = {}
+	o.pages = {} -- HairInfo stored here
 	o.pageCurrent = 1
-	o.onSelect = nil
-	o.selectedDisplay = ""
+	o.onSelect = nil -- Callback
 	o.isBeard = isBeard
 	o.showNameOnHover = false
+	o.joypadCursor = 1
+	o.selectedHairInfo = {id = "", display = ""}
+	o.hasInfo = false
 	return o
 end
 
@@ -53,14 +57,14 @@ function HairMenuPanel:initialise()
 	self.offset_x = 0
 	self.offset_y = fnt_height/2
 
-	self.pageLeftButton = ISButton:new(5, self.offset_y, 15, 15, "", self, self.onChangePage)
+	self.pageLeftButton = ISButton:new(5, self.offset_y, 15, 15, "", self, self.onChangePageButton)
 	self.pageLeftButton.internal = "PREV"
 	self.pageLeftButton:initialise()
 	self.pageLeftButton:instantiate()
 	self.pageLeftButton:setImage(getTexture("media/ui/ArrowLeft.png"))
 	self:addChild(self.pageLeftButton)
 	
-	self.pageRightButton = ISButton:new(self.pageLeftButton:getRight() + 5, self.offset_y, 15, 15, "", self, self.onChangePage)
+	self.pageRightButton = ISButton:new(self.pageLeftButton:getRight() + 5, self.offset_y, 15, 15, "", self, self.onChangePageButton)
 	self.pageRightButton.internal = "NEXT"
 	self.pageRightButton:initialise()
 	self.pageRightButton:instantiate()
@@ -82,8 +86,7 @@ function HairMenuPanel:initialise()
 			hairAvatar:instantiate()
 			hairAvatar:setVisible(true)
 			hairAvatar.onSelect = function(hairAvatar)
-				self.selectedDisplay = hairAvatar.hairInfo.display
-				if self.onSelect then self.onSelect(hairAvatar.hairInfo.id) end
+				self:onAvatarSelect(hairAvatar)
 			end
 			local old_onMouseMove = hairAvatar.onMouseMove
 			hairAvatar.onMouseMove = function(avatar, x, y)
@@ -104,6 +107,13 @@ function HairMenuPanel:initialise()
 	end
 
 	self.offset_y = self.offset_y + (self.gridRows * self.gridSizeY) + (self.gap * (self.gridRows-1))
+end
+
+function HairMenuPanel:onAvatarSelect(hairAvatar)
+	if self.selectedHairInfo then self.selectedHairInfo.selected = false end
+	self.selectedHairInfo = hairAvatar.hairInfo
+	self.selectedHairInfo.selected = true
+	if self.onSelect then self.onSelect(hairAvatar.hairInfo.id) end
 end
 
 function HairMenuPanel:setDesc(desc)
@@ -151,18 +161,21 @@ function HairMenuPanel:setHairList(list)
 		self.pageCurrent = #self.pages
 	end
 	self:showPage(self.pageCurrent)
+	--TODO: Adding this seems to cause the unstable hair orderings
+	-- self:onAvatarSelect(self.avatarList[1])
+	self.hasInfo = true
 end
 
-function HairMenuPanel:onChangePage(button,x,y)
+function HairMenuPanel:onChangePageButton(button,x,y)
 	if button.internal == "NEXT" then 
-		self.pageCurrent = self.pageCurrent + 1
+		self:changePage(1)
 	elseif button.internal == "PREV" then 
-		self.pageCurrent = self.pageCurrent - 1
+		self:changePage(-1)
 	end
+end
 
-	if self.pageCurrent > #self.pages then self.pageCurrent = #self.pages end
-	if self.pageCurrent < 1 then self.pageCurrent = 1 end
-
+function HairMenuPanel:changePage(step)
+	self.pageCurrent = ImprovedHairMenu.math.wrap(self.pageCurrent + step, 1, #self.pages)
 	self:showPage(self.pageCurrent)
 end
 
@@ -180,3 +193,59 @@ function HairMenuPanel:showPage(page_number)
 		end
 	end
 end
+
+-- TODO: Use this on mouse over to highlight the hover
+function HairMenuPanel:setAvatarAsCursor(avatar)
+	for k,a in pairs(self.avatarList) do
+		a.cursor = false
+	end
+	avatar.cursor = true
+end
+
+--##################
+--Controller Support
+--##################
+
+--[[ 
+	We never actually get the joypad focus onto this element.
+	Similar to how vanilla handles this (see `ISPanelJoypad`) we forward events from the panel to the element.
+ ]]
+
+function HairMenuPanel:stepCursor(step)
+	self.joypadCursor = ImprovedHairMenu.math.wrap(self.joypadCursor + step, 1, self.pageSize)
+	self:setAvatarAsCursor(self.avatarList[self.joypadCursor])
+end
+
+function HairMenuPanel:setJoypadFocused(focused, joypadData)
+	-- You can either ignore this here or make heavy changes to `ISPanelJoypad` to not call this function on hair menus, guess which I picked.
+	return
+end
+
+function HairMenuPanel:onJoypadDown(button, joypadData)
+	-- if not self.joypadFocused == true then return end
+	if button == Joypad.RBumper then self:changePage(1) end
+	if button == Joypad.LBumper then self:changePage(-1) end
+	if button == Joypad.AButton then
+		if self.avatarList[self.joypadCursor] then self:onAvatarSelect(self.avatarList[self.joypadCursor]) end
+	end
+	if button == Joypad.XButton then
+		if self.stubbleTickBox then self.stubbleTickBox:forceClick() end
+	end
+	if button == Joypad.YButton then
+		if self.hairColorBtn then self.hairColorBtn:forceClick() end
+	end
+end
+
+function HairMenuPanel:onJoypadDirLeft(joypadData)  self:stepCursor(-1) end
+function HairMenuPanel:onJoypadDirRight(joypadData) self:stepCursor(1)  end
+
+function HairMenuPanel:onJoypadDirDown(joypadData)
+	--[[ 
+		We could add variables to determine when the next step down would move out of this element.
+		e.g. `CursorAtBottom` then in the panel, ```if hairmenu.CursorAtBottom then dontsendevent()```
+		same applies for `onJoypadDirUp`
+	 ]]
+end
+
+-- function HairMenuPanel:onJoypadDirUp(joypadData)
+-- end
