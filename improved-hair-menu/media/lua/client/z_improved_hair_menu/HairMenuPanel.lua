@@ -91,11 +91,12 @@ function HairMenuPanel:initialise()
 			hairAvatar.onMouseMove = function(avatar, x, y)
 				old_onMouseMove(avatar, x, y)
 
+				-- FIXME: Doesn't work
 				if self.showNameOnHover then
 					local x = self:getMouseX()
 					local y = self:getMouseY()
 					if avatar:containsPoint(x,y) then
-						self.selectedDisplay = avatar.hairInfo.display
+						self.setSelectedInfo(avatar.hairInfo)
 					end
 				end
 			end
@@ -112,7 +113,7 @@ function HairMenuPanel:onAvatarSelect(hairAvatar)
 	self:selectInfo(hairAvatar.hairInfo)
 end
 
--- Silently updates the hair info selection, avoiding triggering the `onSelect` callback which can cause infintie loops.
+-- Silently updates the hair info selection, avoiding triggering the `onSelect` callback which can cause infinite loops.
 function HairMenuPanel:setSelectedInfo(hairInfo)
 	-- This function has to allow for nil as beard menus might be initialized to nil if starting with a female character.
 	if self.selectedHairInfo then self.selectedHairInfo.selected = false end
@@ -146,7 +147,12 @@ function HairMenuPanel:applyHair(desc)
 end
 
 function HairMenuPanel:setHairList(list)
-	self.info = list
+	if type(list) ~= "table" then
+		print("HairMenuPanel:setHairList() given a non-table value, ignoring and setting to blank table.")
+		self.info = {}
+	else
+		self.info = list
+	end
 	self:showPage(1)
 end
 
@@ -171,10 +177,12 @@ function HairMenuPanel:showPage(page_number)
 	for i=1,self.pageSize do
 		local info = self.info[((page_number-1) * self.pageSize) + i]
 		if info then 
+			self.avatarList[i].selectable = true
 			self.avatarList[i]:setHairInfo(info)
 			self.avatarList[i]:applyHair()
 			self.avatarList[i]:setVisible(true)
 		else
+			self.avatarList[i].selectable = false
 			self.avatarList[i]:setVisible(false)
 		end
 	end

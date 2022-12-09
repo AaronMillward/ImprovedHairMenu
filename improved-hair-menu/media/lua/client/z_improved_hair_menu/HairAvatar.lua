@@ -9,7 +9,6 @@ local texture_razor    = getTexture("media/ui/Razor.png")
 local texture_gel      = getTexture("media/ui/HairGel.png")
 
 local base = ISUI3DModelExt
-
 HairAvatar = base:derive("HairAvatar")
 
 function HairAvatar:new(x, y, width, height, isBeard)
@@ -38,13 +37,30 @@ function HairAvatar:render()
 		local x_pos = self:getWidth()-20
 		local y_pos = 0
 		local size = 20
-		if self.hairInfo.requirements == "scissors" then
-			self:drawTextureScaled(texture_scissors, x_pos,y_pos, size,size, 1, 1, 0.5, 0.5);
-		elseif self.hairInfo.requirements == "scissorsrazor" then
-			self:drawTextureScaled(texture_scissors, x_pos,y_pos, size,size, 1, 1, 0.5, 0.5);
-			self:drawTextureScaled(texture_razor, x_pos,y_pos+size, size,size, 1, 1, 0.5, 0.5);
-		elseif self.hairInfo.requirements == "hairgel" then
-			self:drawTextureScaled(texture_gel, x_pos,y_pos, size,size, 1, 1, 0.5, 0.5);
+
+		if self.hairInfo.requirements.scissors ~= nil then
+			if self.hairInfo.requirements.scissors then
+				self:drawTextureScaled(texture_scissors, x_pos,y_pos, size,size, 1, 1, 1, 1);
+			else
+				self:drawTextureScaled(texture_scissors, x_pos,y_pos, size,size, 1, 1, 0.5, 0.5);
+			end
+		end
+
+		if self.hairInfo.requirements.razor ~= nil then
+			-- HACK: Razor only appears for "Bald" which also has scissors so we always draw the razor below regardless.
+			if self.hairInfo.requirements.razor then
+				self:drawTextureScaled(texture_razor, x_pos,y_pos+size, size,size, 1, 1, 1, 1);
+			else
+				self:drawTextureScaled(texture_razor, x_pos,y_pos+size, size,size, 1, 1, 0.5, 0.5);
+			end
+		end
+
+		if self.hairInfo.requirements.hairgel ~= nil then
+			if self.hairInfo.requirements.hairgel then
+				self:drawTextureScaled(texture_gel, x_pos,y_pos, size,size, 1, 1, 1, 1);
+			else
+				self:drawTextureScaled(texture_gel, x_pos,y_pos, size,size, 1, 1, 0.5, 0.5);
+			end
 		end
 	end
 	if self.hairInfo.selected == true then self:drawRectBorder(0, 0, self.width, self.height, 0.5,0,1,0) end
@@ -125,4 +141,15 @@ function HairAvatar:applyHair()
 	end
 
 	original_setter(visual, original_hair)
+end
+
+function HairAvatar:select()
+	-- NOTE: Don't allow selection of hairs missing a requirement.
+	if self.hairInfo.requirements then
+		if self.hairInfo.requirements.scissors == false then return end
+		if self.hairInfo.requirements.scissors == false and self.hairInfo.requirements.razor == false then return end -- HACK: Razor only appears along side scissors in an OR relationship
+		if self.hairInfo.requirements.hairgel == false then return end
+	end
+
+	base.select(self)
 end

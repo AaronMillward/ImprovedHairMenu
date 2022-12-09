@@ -9,6 +9,7 @@ function ISUI3DModelExt:new(x, y, width, height)
 	local o = base.new(self, x, y, width, height)
 	o.hasDragged = false
 	o.onSelect = nil
+	o.selectable = true
 	return o
 end
 
@@ -31,7 +32,7 @@ end
 function ISUI3DModelExt:onMouseUp(x, y)
 	if self.mouseDown then
 		if self.hasDragged == false then
-			self:onSelect()
+			self:select()
 		end
 	end
 	self.hasDragged = false
@@ -41,13 +42,15 @@ end
 function ISUI3DModelExt:onMouseUpOutside(x, y)
 	if self.mouseDown then
 		if self.hasDragged == false then
-			self:onSelect()
+			self:select()
 		end
 	end
 	self.hasDragged = false
 	base.onMouseUpOutside(self, x, y)
 end
 
-function ISUI3DModelExt:onSelect() 
-	if self.onSelect then self.onSelect(self) end
+function ISUI3DModelExt:select()
+	if self.selectable and self.onSelect then
+		self.onSelect(self)
+	end
 end
