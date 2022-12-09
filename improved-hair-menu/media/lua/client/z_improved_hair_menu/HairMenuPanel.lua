@@ -112,11 +112,12 @@ function HairMenuPanel:onAvatarSelect(hairAvatar)
 	self:selectInfo(hairAvatar.hairInfo)
 end
 
--- Silently updates the hair info selection, avoiding triggering the `onSelect` callback which can cause infintie loops
+-- Silently updates the hair info selection, avoiding triggering the `onSelect` callback which can cause infintie loops.
 function HairMenuPanel:setSelectedInfo(hairInfo)
+	-- This function has to allow for nil as beard menus might be initialized to nil if starting with a female character.
 	if self.selectedHairInfo then self.selectedHairInfo.selected = false end
 	self.selectedHairInfo = hairInfo
-	self.selectedHairInfo.selected = true
+	if self.selectedHairInfo then self.selectedHairInfo.selected = true end
 end
 
 function HairMenuPanel:selectInfo(hairInfo)
