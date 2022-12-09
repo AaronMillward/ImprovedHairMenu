@@ -27,9 +27,76 @@ function CharacterCreationMain:ihm_update_preview_model(desc)
 	end
 end
 
---To reduce vanilla mods we use the comboboxes to get and select hair styles
 local base_CharacterCreationMain_disableBtn = CharacterCreationMain.disableBtn
 function CharacterCreationMain:disableBtn()
+
+	--##################
+	--Generate Hair List
+	--##################
+
+	--[[ 
+		Originally we read this data out of the combobox but this is making things increasingly difficult.
+		With this change the menu can become indepenedent of the original UI.
+	 ]]
+	
+	local desc = MainScreen.instance.desc
+	if self.female ~= desc:isFemale() or CharacterCreationMain.forceUpdateCombo then
+		-- Don't do this, the vanilla function will handle it.
+		-- CharacterCreationMain.forceUpdateCombo = false;
+
+		-- Replaces "self.female" in this block as vanilla also does this same sex switch check. so if we overwrite it here it will break vanilla.
+		local female = desc:isFemale()
+		
+		-- Get Hair Info
+		local infoHair = {}
+		local hairStyles = getAllHairStyles(desc:isFemale())
+		for i=1,hairStyles:size() do
+			local styleId = hairStyles:get(i-1)
+			local hairStyle = female and getHairStylesInstance():FindFemaleStyle(styleId) or getHairStylesInstance():FindMaleStyle(styleId)
+			local label = styleId
+			if label == "" then
+				label = getText("IGUI_Hair_Bald")
+			else
+				label = getText("IGUI_Hair_" .. label);
+			end
+			if not hairStyle:isNoChoose() then
+				table.insert(infoHair, {
+					id = hairStyles:get(i-1),
+					display = label,
+					selected = false,
+				})
+			end
+		end
+
+		if self.hairMenu then self.hairMenu:setHairList(infoHair) end
+		
+		-- Get Beard Info
+		local infoBeard = {}
+		if desc:isFemale() then
+			-- no bearded ladies
+		else
+			local beardStyles = getAllBeardStyles()
+			for i=1,beardStyles:size() do
+				local label = beardStyles:get(i-1)
+				if label == "" then
+					label = getText("IGUI_Beard_None")
+				else
+					label = getText("IGUI_Beard_" .. label);
+				end
+				table.insert(infoBeard, {
+					id = beardStyles:get(i-1),
+					display = label,
+					selected = false,
+				})
+			end
+			if self.beardMenu then self.beardMenu:setHairList(infoBeard) end
+		end
+	end
+
+	--##################
+	--/Generate Hair List
+	--##################
+
 	--[[ 
 		When the game updates disableBtn will break due to elements changing causing calls to nil in disableBtn.
 		If we catch the error here, it will not propegate and break the whole main menu.
@@ -42,43 +109,18 @@ function CharacterCreationMain:disableBtn()
 	if self.hairStubbleLbl  then self.hairStubbleLbl:setVisible(false)  end
 	if self.beardStubbleLbl then self.beardStubbleLbl:setVisible(false) end
 
-	-- Check if hairInfo is already present, we don't want to regenerate it as it holds data about the selection
-	if self.hairTypeCombo and self.hairMenu and not self.hairMenu.hasInfo then
-		local hairs = {}
-		for i=1,#self.hairTypeCombo.options do
-			local info = {}
-			info.id = self.hairTypeCombo:getOptionData(i):lower()
-			info.display = self.hairTypeCombo:getOptionText(i)
-			info.selected = false
-	
-			table.insert(hairs, info)
-		end
-	
-		self.hairMenu:setHairList(hairs)
+	if self.hairMenu then
+		-- hairMenu's onSelect triggers disableBtn so we need to set the selection silently to avoid an infinite loop
+		self.hairMenu:setSelectedInfo(self.hairMenu.info[self.hairTypeCombo.selected])
 	end
 
-	if self.beardTypeCombo and self.beardMenu and not self.beardMenu.hasInfo then
+	if self.beardMenu then
 		local vis = not MainScreen.instance.desc:isFemale()
 		self.beardMenu:setVisible(vis)
 		if self.beardMenuButton then self.beardMenuButton:setVisible(vis) end
-		if vis then
-			local hairs = {}
-			for i=1,#self.beardTypeCombo.options do
-				local info = {}
-				info.id = self.beardTypeCombo:getOptionData(i):lower()
-				info.display = self.beardTypeCombo:getOptionText(i)
-				info.selected = false
-		
-				table.insert(hairs, info)
-			end
-			self.beardMenu:setHairList(hairs)
-		end
+		self.beardMenu:setSelectedInfo(self.beardMenu.info[self.beardTypeCombo.selected])
 	end
 end
-
---#################
---## Hair Styles ##
---#################
 
 local function is_low_res()
 	--[[
@@ -90,14 +132,18 @@ local function is_low_res()
 	return (getCore():getScreenHeight() <= 900)
 end
 
+--#################
+--## Hair Styles ##
+--#################
+
 --[[
 	Here's where we replace the original hair combo with our new menu.
 	This does overwrite the original code but compared with rearranging the existing elements by hand this just seems easier.
 
 	The only real changes made here are
-	- Removal of labels
-	- Hiding original combobox
-	- Adding hair menu
+	- Remove labels
+	- Hide original combobox
+	- Add hair menu
 	- Reparent hairColorBtn to hair menu
 	- colorPickerHair mouse capture, this includes the onHairColorMouseDown changes below
 		We do this to stop click through selecting different hairs under the color picker
@@ -139,39 +185,12 @@ function CharacterCreationMain:createHairTypeBtn()
 	local menu_size = ImprovedHairMenu.settings:get_menu_size(false)
 
 	self.hairMenu = panelType:new(self.xOffset, self.yOffset, avatar_size,avatar_size, menu_size.cols,menu_size.rows, 3, false)
-	self.hairMenu.onSelect = function(select_name)
-		for i=1,#self.hairTypeCombo.options do
-			local name = self.hairTypeCombo:getOptionData(i):lower()
-			if name == select_name:lower() then
-				--[[
-					~~
-					Leaving this here in case I have this problem in the future.
-					This set me back a while, basically it's a matter of procedure.
-
-						onHairTypeSelected(combo)
-					Sets the hair model on the player.
-						desc:getHumanVisual():setHairModel(hair)
-					So the avatar panel has to be updated.
-						CharacterCreationHeader.instance.avatarPanel:setSurvivorDesc(desc)
-					This triggers the hair menu preview update to apply hair.
-						ihm_update_preview_model()
-						applyHair()
-					So when this func ends and the combobox updates again the models hairstyle is set to the last hair in the menu. 
-					This causes the combo to misalign with the shown hairstyle.
-
-					To fix this we just have to set the hair type in the combo again before leaving the function.
-
-					See the note in HairAvatar:applyHair() about why this is the case.
-					~~
-
-					RESOLVED:
-					HairAvatar now restores the desc exiting so there is no need to correct for this anymore.
-				]]
-				self.hairTypeCombo.selected = i
-				self:onHairTypeSelected(self.hairTypeCombo)
-				break
-			end
-		end
+	self.hairMenu.onSelect = function(info) -- INFO: Taken from onHairTypeSelected which requires the combobox as a parameter so obviously can't be used here.
+		local desc = MainScreen.instance.desc
+		self.hairType = 1 -- XXX: I don't really know if this is important or not but this seems to work.
+		desc:getHumanVisual():setHairModel(info.id) -- TODO: vanilla also allows this to be nil
+		CharacterCreationHeader.instance.avatarPanel:setSurvivorDesc(desc)
+		self:disableBtn()
 	end
 	self.hairMenu:initialise()
 	self.hairMenu:setDesc(MainScreen.instance.desc)
@@ -267,13 +286,6 @@ function CharacterCreationMain:onHairColorMouseDown(button, x, y)
 	self.colorPickerHair:setCapture(true)
 end
 
-local base_CharacterCreationMain_onHairTypeSelected = CharacterCreationMain.onHairTypeSelected
-function CharacterCreationMain:onHairTypeSelected(combo)
-	base_CharacterCreationMain_onHairTypeSelected(self, combo)
-	self.hairMenu.selected_display = combo:getOptionText(combo.selected)
-end
-
-
 --##################
 --## Beard Styles ##
 --##################
@@ -321,15 +333,11 @@ function CharacterCreationMain:createBeardTypeBtn()
 	end
 	local menu_size = ImprovedHairMenu.settings:get_menu_size(true)
 	self.beardMenu = panelType:new(self.xOffset, self.yOffset, avatar_size,avatar_size, menu_size.cols,menu_size.rows, 3, true)
-	self.beardMenu.onSelect = function(select_name)
-		for i=1,#self.beardTypeCombo.options do
-			local name = self.beardTypeCombo:getOptionData(i):lower()
-			if name == select_name:lower() then
-				self.beardTypeCombo.selected = i
-				self:onBeardTypeSelected(self.beardTypeCombo)
-				break
-			end
-		end
+	self.beardMenu.onSelect = function(info) -- INFO: See `hairMenu` `onSelect` for more info
+		local desc = MainScreen.instance.desc
+		desc:getHumanVisual():setBeardModel(info.id)
+		CharacterCreationHeader.instance.avatarPanel:setSurvivorDesc(desc)
+		self:disableBtn()
 	end
 	self.beardMenu:initialise()
 	self.beardMenu:setDesc(MainScreen.instance.desc)

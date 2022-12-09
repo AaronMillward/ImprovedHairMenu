@@ -16,7 +16,7 @@ function HairMenuPanel:render()
 	local x_off = self.pageRightButton:getRight()
 
 	x_off = x_off + 10
-	self:drawText(self.pageCurrent .. "/" .. #self.pages, x_off, height/2, 0.9, 0.9, 0.9, 0.9, UIFont.Small)
+	self:drawText(self.pageCurrent .. "/" .. self:getNumberOfPages(), x_off, height/2, 0.9, 0.9, 0.9, 0.9, UIFont.Small)
 
 	x_off = x_off + 40
 
@@ -40,14 +40,13 @@ function HairMenuPanel:new(x, y, size_x, size_y, rows, cols, gap, isBeard)
 	o.pageSize = (rows * cols)
 	o.gap = gap
 	o.avatarList = {}
-	o.pages = {} -- HairInfo stored here
+	o.info = {} -- HairInfo stored here
 	o.pageCurrent = 1
 	o.onSelect = nil -- Callback
 	o.isBeard = isBeard
 	o.showNameOnHover = false
 	o.joypadCursor = 1
 	o.selectedHairInfo = {id = "", display = ""}
-	o.hasInfo = false
 	return o
 end
 
@@ -110,10 +109,21 @@ function HairMenuPanel:initialise()
 end
 
 function HairMenuPanel:onAvatarSelect(hairAvatar)
+	self:selectInfo(hairAvatar.hairInfo)
+end
+
+-- Silently updates the hair info selection, avoiding triggering the `onSelect` callback which can cause infintie loops
+function HairMenuPanel:setSelectedInfo(hairInfo)
 	if self.selectedHairInfo then self.selectedHairInfo.selected = false end
-	self.selectedHairInfo = hairAvatar.hairInfo
+	self.selectedHairInfo = hairInfo
 	self.selectedHairInfo.selected = true
-	if self.onSelect then self.onSelect(hairAvatar.hairInfo.id) end
+end
+
+function HairMenuPanel:selectInfo(hairInfo)
+	if type(hairInfo) == "number" then hairInfo = self.info[hairInfo] end
+	if not hairInfo then print("HairMenuPanel:selectInfo(): info shouldn't be nil") return end
+	self:setSelectedInfo(hairInfo)
+	if self.onSelect then self.onSelect(hairInfo) end
 end
 
 function HairMenuPanel:setDesc(desc)
@@ -135,35 +145,8 @@ function HairMenuPanel:applyHair(desc)
 end
 
 function HairMenuPanel:setHairList(list)
-	self.pages = {}
-	local page_no = 1
-	self.pages[page_no] = {}
-
-	for i=1,#list do
-		adj_i = i - ((page_no-1) * self.pageSize)
-		
-		if adj_i > self.pageSize then
-			page_no = page_no + 1
-			self.pages[page_no] = {}
-			adj_i = i - ((page_no-1) * self.pageSize)
-		end
-		
-		self.pages[page_no][adj_i] = list[i]
-	end
-
-	if #self.pages[page_no] < self.pageSize then
-		for i=#self.pages[page_no]+1,self.pageSize do
-			self.pages[page_no][i] = "DISABLED"
-		end
-	end
-
-	if self.pageCurrent > #self.pages then 
-		self.pageCurrent = #self.pages
-	end
-	self:showPage(self.pageCurrent)
-	--TODO: Adding this seems to cause the unstable hair orderings
-	-- self:onAvatarSelect(self.avatarList[1])
-	self.hasInfo = true
+	self.info = list
+	self:showPage(1)
 end
 
 function HairMenuPanel:onChangePageButton(button,x,y)
@@ -174,24 +157,27 @@ function HairMenuPanel:onChangePageButton(button,x,y)
 	end
 end
 
+function HairMenuPanel:getNumberOfPages()
+	return math.ceil(#self.info / self.pageSize)
+end
+
 function HairMenuPanel:changePage(step)
-	self.pageCurrent = ImprovedHairMenu.math.wrap(self.pageCurrent + step, 1, #self.pages)
-	self:showPage(self.pageCurrent)
+	self:showPage(ImprovedHairMenu.math.wrap(self.pageCurrent + step, 1, self:getNumberOfPages()))
 end
 
 function HairMenuPanel:showPage(page_number)
-	if #self.pages < 1 then return end
-
+	self.pageCurrent = page_number
 	for i=1,self.pageSize do
-		if self.pages[page_number][i] == "DISABLED" then 
-			self.avatarList[i]:setVisible(false)
-		else
-			local hair_data = self.pages[page_number][i]
-			self.avatarList[i]:setHairInfo(hair_data)
+		local info = self.info[((page_number-1) * self.pageSize) + i]
+		if info then 
+			self.avatarList[i]:setHairInfo(info)
 			self.avatarList[i]:applyHair()
 			self.avatarList[i]:setVisible(true)
+		else
+			self.avatarList[i]:setVisible(false)
 		end
 	end
+	self:stepCursor(0) -- Places the cursor correctly
 end
 
 -- TODO: Use this on mouse over to highlight the hover
@@ -213,6 +199,16 @@ end
 
 function HairMenuPanel:stepCursor(step)
 	self.joypadCursor = ImprovedHairMenu.math.wrap(self.joypadCursor + step, 1, self.pageSize)
+	-- TODO: ensure selected avatar is valid
+	-- if not self.avatarList[self.joypadCursor]:IsVisible() then
+	-- 	--XXX: 1 should always be visible as the page wouldn't exist if it wasn't
+	-- 	for i=self.joypadCursor,1 do
+	-- 		if self.avatarList[i]:getIsVisible() then 
+	-- 			self.joypadCursor = i
+	-- 			break
+	-- 		end
+	-- 	end
+	-- end
 	self:setAvatarAsCursor(self.avatarList[self.joypadCursor])
 end
 
@@ -222,7 +218,6 @@ function HairMenuPanel:setJoypadFocused(focused, joypadData)
 end
 
 function HairMenuPanel:onJoypadDown(button, joypadData)
-	-- if not self.joypadFocused == true then return end
 	if button == Joypad.RBumper then self:changePage(1) end
 	if button == Joypad.LBumper then self:changePage(-1) end
 	if button == Joypad.AButton then

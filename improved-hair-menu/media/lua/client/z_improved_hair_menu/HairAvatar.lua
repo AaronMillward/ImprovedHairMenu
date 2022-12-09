@@ -113,11 +113,8 @@ function HairAvatar:applyHair()
 
 	local original_hair = original_getter(visual)
 
-	--When a hair_id isn't passed this usually means it's a "bald" style
-	if self.hairInfo.id ~= "" and self.hairInfo.id ~= nil then
+	if self.hairInfo and self.hairInfo.id then
 		original_setter(visual, self.hairInfo.id)
-	else
-		original_setter(visual, "")
 	end
 	
 	--This appears to copy the desc likely because ISUI3DModel has a java call that probably copies the table by into an object
