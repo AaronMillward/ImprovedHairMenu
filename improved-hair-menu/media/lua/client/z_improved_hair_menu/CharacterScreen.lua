@@ -10,12 +10,13 @@
 
 HairMenuPanelWindow = ISCollapsableWindowJoypad:derive("HairMenuPanelWindow")
 
-function HairMenuPanelWindow:new(x, y, width, height, char, hairlist, isbeard)
+function HairMenuPanelWindow:new(x, y, width, height, playerNum, char, hairlist, isbeard)
 	local o = ISCollapsableWindowJoypad.new(self, x, y, width, height)
 	o.char = char
 	o.hairList = hairlist
 	o.onSelect = nil
 	o.isbeard = isbeard
+	o.playerNum = playerNum
 	return o
 end
 
@@ -41,6 +42,24 @@ end
 
 function HairMenuPanelWindow:close()
 	self:removeFromUIManager()
+	setPrevFocusForPlayer(self.playerNum)
+end
+
+function HairMenuPanelWindow:onJoypadDown(button, joypadData)
+	if button == Joypad.BButton then
+		self:close()
+		return
+	end
+	
+	self.hairPanel:onJoypadDown(button, joypadData)
+end
+
+function HairMenuPanelWindow:onJoypadDirLeft(joypadData)
+	self.hairPanel:onJoypadDirLeft(joypadData)
+end
+
+function HairMenuPanelWindow:onJoypadDirRight(joypadData)
+	self.hairPanel:onJoypadDirRight(joypadData)
 end
 
 --#######################
@@ -177,10 +196,10 @@ function ISCharacterScreen:hairMenu(button)
 		end
 
 		if #tie_options > 0 then
-			hairMenu:addOption(ContextMenu_TieHair, player, ihm_open_hair_menu, tie_options, ContextMenu_TieHair, false)
+			hairMenu:addOption(ContextMenu_TieHair, player, ihm_open_hair_menu, self.playerNum, tie_options, ContextMenu_TieHair, false)
 		end
 		if #cut_options > 0 then
-			hairMenu:addOption(ContextMenu_CutHairFor, player, ihm_open_hair_menu, cut_options, ContextMenu_CutHairFor, false)
+			hairMenu:addOption(ContextMenu_CutHairFor, player, ihm_open_hair_menu, self.playerNum, cut_options, ContextMenu_CutHairFor, false)
 		end
 	else
 		local hairMenu = context
@@ -255,7 +274,7 @@ function ISCharacterScreen:beardMenu(button)
 
 		if #options > 0 then
 			local ContextMenu_TrimBeard_For = string.gsub(getText("ContextMenu_TrimBeard_For"),"%%1","")
-			context:addOption(ContextMenu_TrimBeard_For, player, ihm_open_hair_menu, options, ContextMenu_TrimBeard_For, true)
+			context:addOption(ContextMenu_TrimBeard_For, player, ihm_open_hair_menu, self.playerNum, options, ContextMenu_TrimBeard_For, true)
 		end
 	else
 		local beardMenu = context
@@ -274,8 +293,8 @@ end
 
 local opened_menu = nil
 
-function ihm_open_hair_menu(player, hair_options, title, isBeard)
-	local menu = HairMenuPanelWindow:new(200,200,400,400, player, hair_options, isBeard)
+function ihm_open_hair_menu(player, playerNum, hair_options, title, isBeard)
+	local menu = HairMenuPanelWindow:new(200,200,400,400, playerNum, player, hair_options, isBeard)
 	if isBeard == true then 
 		menu.onSelect = function(selection)
 			ISCharacterScreen.onTrimBeard(player, selection.id)
@@ -298,4 +317,5 @@ function ihm_open_hair_menu(player, hair_options, title, isBeard)
 		opened_menu:close()
 	end
 	opened_menu = menu
+	setJoypadFocus(playerNum, opened_menu)
 end
