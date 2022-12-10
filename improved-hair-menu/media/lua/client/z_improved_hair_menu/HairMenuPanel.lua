@@ -20,8 +20,11 @@ function HairMenuPanel:render()
 
 	x_off = x_off + 40
 
-	self:drawText(self.selectedHairInfo.display or "", x_off, height/2, 0.9, 0.9, 0.9, 0.9, UIFont.Small)
-
+	local text = self.selectedHairInfo.display
+	if self.showNameOnHover then
+		text = self.avatarList[self.joypadCursor].hairInfo.display
+	end
+	self:drawText(text or "", x_off, height/2, 0.9, 0.9, 0.9, 0.9, UIFont.Small)
 end
 
 function HairMenuPanel:new(x, y, size_x, size_y, rows, cols, gap, isBeard)
@@ -90,15 +93,11 @@ function HairMenuPanel:initialise()
 			local old_onMouseMove = hairAvatar.onMouseMove
 			hairAvatar.onMouseMove = function(avatar, x, y)
 				old_onMouseMove(avatar, x, y)
-
-				-- FIXME: Doesn't work
-				if self.showNameOnHover then
-					local x = self:getMouseX()
-					local y = self:getMouseY()
-					if avatar:containsPoint(x,y) then
-						self.setSelectedInfo(avatar.hairInfo)
-					end
-				end
+				--[[ NOTE:
+					There used to be a `containsPoint` check here. it only worked on the main menu or in-game depending on who called `containsPoint`
+					but `onMouseMove` only gets called if the mouse is inside the element anyway so it already fulfilled the purpose of the check.
+				 ]]
+				self:setAvatarAsCursor(avatar)
 			end
 
 			self:addChild(hairAvatar)
@@ -189,10 +188,12 @@ function HairMenuPanel:showPage(page_number)
 	self:stepCursor(0) -- Places the cursor correctly
 end
 
--- TODO: Use this on mouse over to highlight the hover
 function HairMenuPanel:setAvatarAsCursor(avatar)
 	for k,a in pairs(self.avatarList) do
 		a.cursor = false
+		if a == avatar then
+			self.joypadCursor = k
+		end
 	end
 	avatar.cursor = true
 end
