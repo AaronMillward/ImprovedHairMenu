@@ -167,6 +167,15 @@ function HairMenuPanel:getNumberOfPages()
 	return math.ceil(#self.info / self.pageSize)
 end
 
+function HairMenuPanel:getCurrentPageSize()
+	-- HACK: Only the last page has less than pageSize elements
+	if self:getNumberOfPages() ~= self.pageCurrent then
+		return self.pageSize
+	else
+		return #self.info % self.pageSize
+	end
+end
+
 function HairMenuPanel:changePage(step)
 	self:showPage(ImprovedHairMenu.math.wrap(self.pageCurrent + step, 1, self:getNumberOfPages()))
 end
@@ -210,7 +219,23 @@ end
  ]]
 
 function HairMenuPanel:stepCursor(direction)
+	local direction = ImprovedHairMenu.math.sign(direction)
+
+	-- INFO: `stepCursor` is only called by joypad events we don't need any flags for joypad usage
+	if direction ~= 0 then
+		if self.joypadCursor + direction > self:getCurrentPageSize() then
+			self.joypadCursor = 1
+			self:changePage(1)
+			return
+		elseif self.joypadCursor + direction < 1 then
+			self.joypadCursor = self.pageSize
+			self:changePage(-1)
+			return
+		end
+	end
+
 	local cursor = ImprovedHairMenu.math.wrap(self.joypadCursor + direction, 1, self.pageSize)
+
 	if not self.avatarList[cursor].selectable == true then 
 		for i=0,self.pageSize do
 			local new_cursor = ImprovedHairMenu.math.wrap(self.joypadCursor - i, 1, self.pageSize) -- NOTE: Move downwards as avatars are seqential.
@@ -220,6 +245,7 @@ function HairMenuPanel:stepCursor(direction)
 			end
 		end
 	end
+	
 	self:setAvatarAsCursor(self.avatarList[cursor])
 end
 
