@@ -232,7 +232,7 @@ function HairMenuPanel:onJoypadDown(button, joypadData)
 	if button == Joypad.RBumper then self:changePage(1) end
 	if button == Joypad.LBumper then self:changePage(-1) end
 	if button == Joypad.AButton then
-		if self.avatarList[self.joypadCursor] then self:onAvatarSelect(self.avatarList[self.joypadCursor]) end
+		if self.avatarList[self.joypadCursor] then self.avatarList[self.joypadCursor]:select() end
 	end
 	if button == Joypad.XButton then
 		if self.stubbleTickBox then self.stubbleTickBox:forceClick() end
