@@ -189,6 +189,8 @@ function HairMenuPanel:showPage(page_number)
 end
 
 function HairMenuPanel:setAvatarAsCursor(avatar)
+	if not avatar then return end
+
 	for k,a in pairs(self.avatarList) do
 		a.cursor = false
 		if a == avatar then
@@ -207,19 +209,18 @@ end
 	Similar to how vanilla handles this (see `ISPanelJoypad`) we forward events from the panel to the element.
  ]]
 
-function HairMenuPanel:stepCursor(step)
-	self.joypadCursor = ImprovedHairMenu.math.wrap(self.joypadCursor + step, 1, self.pageSize)
-	-- TODO: ensure selected avatar is valid
-	-- if not self.avatarList[self.joypadCursor]:IsVisible() then
-	-- 	--XXX: 1 should always be visible as the page wouldn't exist if it wasn't
-	-- 	for i=self.joypadCursor,1 do
-	-- 		if self.avatarList[i]:getIsVisible() then 
-	-- 			self.joypadCursor = i
-	-- 			break
-	-- 		end
-	-- 	end
-	-- end
-	self:setAvatarAsCursor(self.avatarList[self.joypadCursor])
+function HairMenuPanel:stepCursor(direction)
+	local cursor = ImprovedHairMenu.math.wrap(self.joypadCursor + direction, 1, self.pageSize)
+	if not self.avatarList[cursor].selectable == true then 
+		for i=0,self.pageSize do
+			local new_cursor = ImprovedHairMenu.math.wrap(self.joypadCursor - i, 1, self.pageSize) -- NOTE: Move downwards as avatars are seqential.
+			if self.avatarList[new_cursor].selectable == true then 
+				cursor = new_cursor
+				break
+			end
+		end
+	end
+	self:setAvatarAsCursor(self.avatarList[cursor])
 end
 
 function HairMenuPanel:setJoypadFocused(focused, joypadData)
