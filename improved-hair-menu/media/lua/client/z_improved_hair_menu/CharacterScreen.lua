@@ -20,6 +20,17 @@ function HairMenuPanelWindow:new(x, y, width, height, playerNum, char, hairlist,
 	return o
 end
 
+function HairMenuPanelWindow:render()
+	ISCollapsableWindowJoypad.render(self)
+
+	if JoypadState.players[self.playerNum+1] then
+		if JoypadState.players[self.playerNum+1].focus == self then
+			self:drawRectBorder(0, 0, self:getWidth(), self:getHeight(), 0.4, 0.2, 1.0, 1.0);
+			self:drawRectBorder(1, 1, self:getWidth()-2, self:getHeight()-2, 0.4, 0.2, 1.0, 1.0);
+		end
+	end
+end
+
 function HairMenuPanelWindow:createChildren()
 	ISCollapsableWindowJoypad.createChildren(self)
 
