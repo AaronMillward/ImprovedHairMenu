@@ -218,6 +218,23 @@ end
 	Similar to how vanilla handles this (see `ISPanelJoypad`) we forward events from the panel to the element.
  ]]
 
+function HairMenuPanel:setCursor(index)
+	local cursor = ImprovedHairMenu.math.clamp(index, 1, self.pageSize)
+
+	if not self.avatarList[cursor].selectable == true then 
+		for i=0,self.pageSize do
+			local new_cursor = ImprovedHairMenu.math.wrap(cursor - i, 1, self.pageSize) -- NOTE: Move downwards as avatars are seqential.
+			if self.avatarList[new_cursor].selectable == true then 
+				cursor = new_cursor
+				break
+			end
+		end
+	end
+	
+	self.joypadCursor = cursor
+	self:setAvatarAsCursor(self.avatarList[cursor])
+end
+
 function HairMenuPanel:stepCursor(direction)
 	local direction = ImprovedHairMenu.math.sign(direction)
 
@@ -234,24 +251,11 @@ function HairMenuPanel:stepCursor(direction)
 		end
 	end
 
-	local cursor = ImprovedHairMenu.math.wrap(self.joypadCursor + direction, 1, self.pageSize)
-
-	if not self.avatarList[cursor].selectable == true then 
-		for i=0,self.pageSize do
-			local new_cursor = ImprovedHairMenu.math.wrap(self.joypadCursor - i, 1, self.pageSize) -- NOTE: Move downwards as avatars are seqential.
-			if self.avatarList[new_cursor].selectable == true then 
-				cursor = new_cursor
-				break
-			end
-		end
-	end
-	
-	self:setAvatarAsCursor(self.avatarList[cursor])
+	self:setCursor(self.joypadCursor + direction)
 end
 
 function HairMenuPanel:setJoypadFocused(focused, joypadData)
-	-- You can either ignore this here or make heavy changes to `ISPanelJoypad` to not call this function on hair menus, guess which I picked.
-	return
+	-- XXX: This function has to at least exist as vanilla calls it on any element that doesn't directly recieve focus
 end
 
 function HairMenuPanel:onJoypadDown(button, joypadData)
@@ -277,7 +281,15 @@ function HairMenuPanel:onJoypadDirDown(joypadData)
 		e.g. `CursorAtBottom` then in the panel, ```if hairmenu.CursorAtBottom then dontsendevent()```
 		same applies for `onJoypadDirUp`
 	 ]]
+	local i = self.joypadCursor + self.gridCols
+	if self.avatarList[i] and self.avatarList[i].selectable == true then
+		self:setCursor(i)
+	end
 end
 
--- function HairMenuPanel:onJoypadDirUp(joypadData)
--- end
+function HairMenuPanel:onJoypadDirUp(joypadData)
+	local i = self.joypadCursor - self.gridCols
+	if self.avatarList[i] and self.avatarList[i].selectable == true then
+		self:setCursor(i)
+	end
+end

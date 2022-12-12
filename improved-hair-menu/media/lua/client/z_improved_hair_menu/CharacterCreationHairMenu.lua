@@ -197,6 +197,8 @@ function CharacterCreationMain:createHairTypeBtn()
 	
 	if use_modal then
 		local function showMenu(target)
+			target.hairMenuButton.expanded = true
+			target.hairMenuButton.attachedMenu = target.hairMenu
 			target:removeChild(target.hairMenu)
 			target:addChild(target.hairMenu)
 			target.hairMenu:setX( (target:getWidth()/2) - (target.hairMenu:getWidth()/2) )
@@ -207,11 +209,15 @@ function CharacterCreationMain:createHairTypeBtn()
 		self.hairMenu.onClose = function()
 			self:removeChild(self.hairMenu)
 			self.hairMenu:setCapture(false)
+			self.hairMenuButton.expanded = false
 		end
 
 		self.hairMenuButton = ISButton:new(self.xOffset, self.yOffset, 90, FONT_HGT_SMALL*2, getText("IGUI_Open"), self, showMenu)
 		self.hairMenuButton:initialise()
 		self.hairMenuButton:instantiate()
+		self.hairMenuButton.isHairMenuButton = true
+		self.hairMenuButton.isButton = nil -- We don't want this button to be picked up by the vanilla joypad functions
+		self.hairMenuButton.expanded = false
 		self.characterPanel:addChild(self.hairMenuButton)
 
 		self.yOffset = self.yOffset + self.hairMenuButton:getHeight() + 5;
@@ -344,6 +350,8 @@ function CharacterCreationMain:createBeardTypeBtn()
 	
 	if use_modal then
 		local function showMenu(target)
+			target.beardMenuButton.expanded = true
+			target.beardMenuButton.attachedMenu = target.beardMenu
 			target:removeChild(target.beardMenu)
 			target:addChild(target.beardMenu)
 			target.beardMenu:setX( (target:getWidth()/2) - (target.beardMenu:getWidth()/2) )
@@ -354,11 +362,15 @@ function CharacterCreationMain:createBeardTypeBtn()
 		self.beardMenu.onClose = function()
 			self:removeChild(self.beardMenu)
 			self.beardMenu:setCapture(false)
+			self.beardMenuButton.expanded = false
 		end
 
 		self.beardMenuButton = ISButton:new(self.xOffset, self.yOffset, 90, FONT_HGT_SMALL*2, getText("IGUI_Open"), self, showMenu)
 		self.beardMenuButton:initialise()
 		self.beardMenuButton:instantiate()
+		self.beardMenuButton.isHairMenuButton = true
+		self.beardMenuButton.isButton = nil -- We don't want this button to be picked up by the vanilla joypad functions
+		self.beardMenuButton.expanded = false
 		self.characterPanel:addChild(self.beardMenuButton)
 
 		self.yOffset = self.yOffset + self.beardMenuButton:getHeight() + 5;
@@ -383,10 +395,4 @@ function CharacterCreationMain:createBeardTypeBtn()
 	self.beardMenu.stubbleTickBox = self.beardStubbleTickBox
 
 	self.yOffset = self.yOffset + comboHgt + 10;
-end
-
-local base_CharacterCreationMain_onBeardTypeSelected = CharacterCreationMain.onBeardTypeSelected
-function CharacterCreationMain:onBeardTypeSelected(combo)
-	base_CharacterCreationMain_onBeardTypeSelected(self, combo)
-	self.beardMenu.selected_display = combo:getOptionText(combo.selected)
 end
