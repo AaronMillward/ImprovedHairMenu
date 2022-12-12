@@ -11,9 +11,15 @@ ImprovedHairMenu.settings.beard_cols = 1
 ImprovedHairMenu.settings.modal_rows = 8
 ImprovedHairMenu.settings.modal_cols = 6
 
+
 if ModOptions and ModOptions.getInstance then
+	--[[ FIXME:
+		Applying the modal option sometimes crashes the game. however the `OnApply` function doesn't seem to get called
+		so I don't know if this is even my fault.
+	 ]]
+
 	local function OnApply(option)
-		--XXX: Reloading all mods might be too slow but I think it's the only way to reload the UI?
+		-- XXX: Reloading all mods might be too slow but I think it's the only way to reload the UI?
 		option:resetLua()
 	end
 
