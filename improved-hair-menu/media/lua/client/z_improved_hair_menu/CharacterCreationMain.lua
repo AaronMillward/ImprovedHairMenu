@@ -128,6 +128,12 @@ function CharacterCreationMainCharacterPanel:onJoypadDirUp(joypadData)
 		else
 			old_onJoypadDirUp(self, joypadData)
 		end
+	elseif child and child.isHairMenu then
+		if child:isNextUpOutside() then
+			old_onJoypadDirUp(self, joypadData)
+		else
+			child:onJoypadDirUp(joypadData)
+		end
 	else
 		old_onJoypadDirUp(self, joypadData)
 	end
@@ -141,6 +147,12 @@ function CharacterCreationMainCharacterPanel:onJoypadDirDown(joypadData)
 			child.attachedMenu:onJoypadDirDown(joypadData)
 		else
 			old_onJoypadDirDown(self, joypadData)
+		end
+	elseif child and child.isHairMenu then
+		if child:isNextDownOutside() then
+			old_onJoypadDirDown(self, joypadData)
+		else
+			child:onJoypadDirDown(joypadData)
 		end
 	else
 		old_onJoypadDirDown(self, joypadData)

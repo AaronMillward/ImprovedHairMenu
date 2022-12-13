@@ -7,6 +7,10 @@ local FONT_HGT_SMALL = getTextManager():getFontHeight(UIFont.Small)
 local FONT_HGT_MEDIUM = getTextManager():getFontHeight(UIFont.Medium)
 local header_height = FONT_HGT_SMALL + 14
 
+local function predicateAvatarIsSelectable(avatar)
+	return avatar and avatar.selectable == true
+end
+
 local base = ISPanelJoypad
 HairMenuPanel = base:derive("HairMenuPanel")
 
@@ -254,6 +258,15 @@ function HairMenuPanel:stepCursor(direction)
 	self:setCursor(self.joypadCursor + direction)
 end
 
+-- Determines if the next joypad press should move outside the menu
+function HairMenuPanel:isNextDownOutside()
+	return not predicateAvatarIsSelectable(self.avatarList[self.joypadCursor + self.gridCols])
+end
+
+function HairMenuPanel:isNextUpOutside()
+	return not predicateAvatarIsSelectable(self.avatarList[self.joypadCursor - self.gridCols])
+end
+
 function HairMenuPanel:setJoypadFocused(focused, joypadData)
 	-- XXX: This function has to at least exist as vanilla calls it on any element that doesn't directly recieve focus
 end
@@ -276,20 +289,15 @@ function HairMenuPanel:onJoypadDirLeft(joypadData)  self:stepCursor(-1) end
 function HairMenuPanel:onJoypadDirRight(joypadData) self:stepCursor(1)  end
 
 function HairMenuPanel:onJoypadDirDown(joypadData)
-	--[[ 
-		We could add variables to determine when the next step down would move out of this element.
-		e.g. `CursorAtBottom` then in the panel, ```if hairmenu.CursorAtBottom then dontsendevent()```
-		same applies for `onJoypadDirUp`
-	 ]]
 	local i = self.joypadCursor + self.gridCols
-	if self.avatarList[i] and self.avatarList[i].selectable == true then
+	if predicateAvatarIsSelectable(self.avatarList[i]) then
 		self:setCursor(i)
 	end
 end
 
 function HairMenuPanel:onJoypadDirUp(joypadData)
 	local i = self.joypadCursor - self.gridCols
-	if self.avatarList[i] and self.avatarList[i].selectable == true then
+	if predicateAvatarIsSelectable(self.avatarList[i]) then
 		self:setCursor(i)
 	end
 end

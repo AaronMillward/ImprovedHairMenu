@@ -77,6 +77,14 @@ function HairMenuPanelWindow:onJoypadDirRight(joypadData)
 	self.hairPanel:onJoypadDirRight(joypadData)
 end
 
+function HairMenuPanelWindow:onJoypadDirUp(joypadData)
+	self.hairPanel:onJoypadDirUp(joypadData)
+end
+
+function HairMenuPanelWindow:onJoypadDirDown(joypadData)
+	self.hairPanel:onJoypadDirDown(joypadData)
+end
+
 --#######################
 --## ISCharacterScreen ##
 --#######################
