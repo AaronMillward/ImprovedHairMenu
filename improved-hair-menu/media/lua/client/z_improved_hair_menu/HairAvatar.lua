@@ -64,7 +64,13 @@ function HairAvatar:render()
 		end
 	end
 	if self.hairInfo.selected == true then self:drawRectBorder(0, 0, self.width, self.height, 0.5,0,1,0) end
-	if (not self.hairInfo.selected) and self.cursor then self:drawRectBorder(0, 0, self.width, self.height, 0.5,1,1,1) end
+	if self.cursor == true then
+		if self.hairInfo.selected == true then
+			self:drawRectBorder(1, 1, self.width-2, self.height-2, 0.5,1,1,1)
+		else
+			self:drawRectBorder(0, 0, self.width, self.height, 0.5,1,1,1)
+		end
+	end
 end
 
 function HairAvatar:setDesc(desc)
