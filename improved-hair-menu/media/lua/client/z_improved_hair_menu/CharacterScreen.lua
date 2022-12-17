@@ -38,7 +38,7 @@ function HairMenuPanelWindow:createChildren()
 	self.resizable = false
 
 	self.hairPanel = HairMenuPanel:new(0,th, 96,96, 2,3, 3, self.isbeard)
-	self.hairPanel.showNameOnHover = true
+	self.hairPanel.showSelectedName = false
 	self.hairPanel:initialise()
 	self.hairPanel:setChar(self.char)
 	self.hairPanel.onSelect = function(select_name)
@@ -57,32 +57,44 @@ function HairMenuPanelWindow:close()
 	if JoypadState.players[self.playerNum+1] then
 		setJoypadFocus(self.playerNum, self.returnFocus)
 	end
-	-- setPrevFocusForPlayer(self.playerNum)
+end
+
+function HairMenuPanelWindow:onLoseJoypadFocus(joypadData)
+	ISCollapsableWindowJoypad.onLoseJoypadFocus(self, joypadData)
+	self.hairPanel:setJoypadFocused(false)
+end
+
+function HairMenuPanelWindow:onGainJoypadFocus(joypadData)
+	ISCollapsableWindowJoypad.onGainJoypadFocus(self, joypadData)
+	self.hairPanel:setJoypadFocused(true)
 end
 
 function HairMenuPanelWindow:onJoypadDown(button, joypadData)
 	if button == Joypad.BButton then
 		self:close()
-		return
 	end
-	
 	self.hairPanel:onJoypadDown(button, joypadData)
+	ISCollapsableWindowJoypad.onJoypadDown(self, joypadData)
 end
 
 function HairMenuPanelWindow:onJoypadDirLeft(joypadData)
 	self.hairPanel:onJoypadDirLeft(joypadData)
+	ISCollapsableWindowJoypad.onJoypadDirLeft(self, joypadData)
 end
 
 function HairMenuPanelWindow:onJoypadDirRight(joypadData)
 	self.hairPanel:onJoypadDirRight(joypadData)
+	ISCollapsableWindowJoypad.onJoypadDirRight(self, joypadData)
 end
 
 function HairMenuPanelWindow:onJoypadDirUp(joypadData)
 	self.hairPanel:onJoypadDirUp(joypadData)
+	ISCollapsableWindowJoypad.onJoypadDirUp(self, joypadData)
 end
 
 function HairMenuPanelWindow:onJoypadDirDown(joypadData)
 	self.hairPanel:onJoypadDirDown(joypadData)
+	ISCollapsableWindowJoypad.onJoypadDirDown(self, joypadData)
 end
 
 --#######################

@@ -159,3 +159,35 @@ function HairAvatar:select()
 
 	base.select(self)
 end
+
+function HairAvatar:setCursor(state)
+	self.cursor = state
+	if state == true then
+		self:showTooltip()
+	else
+		self:hideTooltip()
+	end
+end
+
+function HairAvatar:showTooltip()
+	if not self.tooltipUI then
+		self.tooltipUI = ISToolTip:new()
+		self.tooltipUI:setOwner(self)
+		self.tooltipUI:setVisible(false)
+		self.tooltipUI:setAlwaysOnTop(true)
+		self.tooltipUI.maxLineWidth = 300
+	end
+	if not self.tooltipUI:getIsVisible() then
+		self.tooltipUI:addToUIManager()
+		self.tooltipUI:setVisible(true)
+	end
+	self.tooltipUI.description = self.hairInfo.display
+	self.tooltipUI:setDesiredPosition(self:getAbsoluteX() + self:getWidth(), self:getAbsoluteY())
+end
+
+function HairAvatar:hideTooltip()
+	if self.tooltipUI and self.tooltipUI:getIsVisible() then
+		self.tooltipUI:setVisible(false)
+		self.tooltipUI:removeFromUIManager()
+	end
+end

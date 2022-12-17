@@ -24,11 +24,9 @@ function HairMenuPanel:render()
 
 	x_off = x_off + 40
 
-	local text = self.selectedHairInfo.display
-	if self.showNameOnHover then
-		text = self.avatarList[self.joypadCursor].hairInfo.display
+	if self.showSelectedName then
+		self:drawText(self.selectedHairInfo.display or "error string", x_off, height/2, 0.9, 0.9, 0.9, 0.9, UIFont.Small)
 	end
-	self:drawText(text or "", x_off, height/2, 0.9, 0.9, 0.9, 0.9, UIFont.Small)
 end
 
 function HairMenuPanel:new(x, y, size_x, size_y, rows, cols, gap, isBeard)
@@ -51,7 +49,7 @@ function HairMenuPanel:new(x, y, size_x, size_y, rows, cols, gap, isBeard)
 	o.pageCurrent = 1
 	o.onSelect = nil -- Callback
 	o.isBeard = isBeard
-	o.showNameOnHover = false
+	o.showSelectedName = true
 	o.joypadCursor = 1
 	o.selectedHairInfo = {id = "", display = ""}
 	return o
@@ -97,11 +95,20 @@ function HairMenuPanel:initialise()
 			local old_onMouseMove = hairAvatar.onMouseMove
 			hairAvatar.onMouseMove = function(avatar, x, y)
 				old_onMouseMove(avatar, x, y)
-				--[[ NOTE:
+				--[[ NOTE:XXX:
 					There used to be a `containsPoint` check here. it only worked on the main menu or in-game depending on who called `containsPoint`
 					but `onMouseMove` only gets called if the mouse is inside the element anyway so it already fulfilled the purpose of the check.
 				 ]]
-				self:setAvatarAsCursor(avatar)
+				self:setCursor(idx)
+			end
+			local old_onMouseMoveOutside = hairAvatar.onMouseMoveOutside
+			hairAvatar.onMouseMoveOutside = function(avatar, x, y)
+				-- NOTE: If this avatar is the cursor then it should set let the panel know when it loses focus.
+				old_onMouseMoveOutside(avatar, x, y)
+				if self.joypadFocus then return end
+				if self.joypadCursor == idx then
+					self:setCursor(nil)
+				end
 			end
 
 			self:addChild(hairAvatar)
@@ -159,6 +166,10 @@ function HairMenuPanel:setHairList(list)
 	self:showPage(1)
 end
 
+-- #########
+-- # Pages #
+-- #########
+
 function HairMenuPanel:onChangePageButton(button,x,y)
 	if button.internal == "NEXT" then 
 		self:changePage(1)
@@ -198,33 +209,21 @@ function HairMenuPanel:showPage(page_number)
 			self.avatarList[i]:setVisible(false)
 		end
 	end
-	self:stepCursor(0) -- Places the cursor correctly
-end
 
-function HairMenuPanel:setAvatarAsCursor(avatar)
-	if not avatar then return end
-
-	for k,a in pairs(self.avatarList) do
-		a.cursor = false
-		if a == avatar then
-			self.joypadCursor = k
-		end
+	if self.joypadFocus then
+		self:makeCursorValid()
+	else
+		self:setCursor(nil)
 	end
-	avatar.cursor = true
 end
 
---##################
---Controller Support
---##################
+-- ##########
+-- # Cursor #
+-- ##########
 
---[[ 
-	We never actually get the joypad focus onto this element.
-	Similar to how vanilla handles this (see `ISPanelJoypad`) we forward events from the panel to the element.
- ]]
-
-function HairMenuPanel:setCursor(index)
+function HairMenuPanel:getValidCursor(index)
+	-- NOTE: index 1 will always be valid as the page wouldn't exist if there wasn't at least 1 element.
 	local cursor = ImprovedHairMenu.math.clamp(index, 1, self.pageSize)
-
 	if not self.avatarList[cursor].selectable == true then 
 		for i=0,self.pageSize do
 			local new_cursor = ImprovedHairMenu.math.wrap(cursor - i, 1, self.pageSize) -- NOTE: Move downwards as avatars are seqential.
@@ -234,23 +233,57 @@ function HairMenuPanel:setCursor(index)
 			end
 		end
 	end
-	
-	self.joypadCursor = cursor
-	self:setAvatarAsCursor(self.avatarList[cursor])
+	return cursor
+end
+
+function HairMenuPanel:setCursor(index)
+	if self.joypadCursor then
+		-- NOTE: Clear old cursor. this should avoid a double cursor as long as everyone uses this function.
+		self.avatarList[self.joypadCursor]:setCursor(false)
+	end
+
+	if not index then
+		self.joypadCursor = nil
+		return
+	end
+
+	self.joypadCursor = self:getValidCursor(index)
+	self.avatarList[self.joypadCursor]:setCursor(true)
+end
+
+function HairMenuPanel:makeCursorValid()
+	self:setCursor(self:getValidCursor(self.joypadCursor))
+end
+
+--##################
+--Controller Support
+--##################
+
+--[[ NOTE:
+	We never actually get the joypad focus onto this element.
+	Similar to how vanilla handles this (see `ISPanelJoypad`) we forward events from the panel to the element.
+ ]]
+
+function HairMenuPanel:ensureCursor()
+	if not self.joypadCursor then
+		self:setCursor(1)
+	end
 end
 
 function HairMenuPanel:stepCursor(direction)
+	self:ensureCursor()
+
 	local direction = ImprovedHairMenu.math.sign(direction)
 
 	-- INFO: `stepCursor` is only called by joypad events we don't need any flags for joypad usage
 	if direction ~= 0 then
 		if self.joypadCursor + direction > self:getCurrentPageSize() then
-			self.joypadCursor = 1
 			self:changePage(1)
+			self:setCursor(1)
 			return
 		elseif self.joypadCursor + direction < 1 then
-			self.joypadCursor = self.pageSize
 			self:changePage(-1)
+			self:setCursor(self.pageSize)
 			return
 		end
 	end
@@ -260,21 +293,34 @@ end
 
 -- Determines if the next joypad press should move outside the menu
 function HairMenuPanel:isNextDownOutside()
+	if not self.joypadCursor then
+		return true
+	end
 	return not predicateAvatarIsSelectable(self.avatarList[self.joypadCursor + self.gridCols])
 end
 
 function HairMenuPanel:isNextUpOutside()
+	if not self.joypadCursor then
+		return true
+	end
 	return not predicateAvatarIsSelectable(self.avatarList[self.joypadCursor - self.gridCols])
 end
 
 function HairMenuPanel:setJoypadFocused(focused, joypadData)
 	-- XXX: This function has to at least exist as vanilla calls it on any element that doesn't directly recieve focus
+	self.joypadFocus = focused
+	if focused then
+		self:setCursor(1)
+	else
+		self:setCursor(nil)
+	end
 end
 
 function HairMenuPanel:onJoypadDown(button, joypadData)
 	if button == Joypad.RBumper then self:changePage(1) end
 	if button == Joypad.LBumper then self:changePage(-1) end
 	if button == Joypad.AButton then
+		self:ensureCursor()
 		if self.avatarList[self.joypadCursor] then self.avatarList[self.joypadCursor]:select() end
 	end
 	if button == Joypad.XButton then
@@ -289,6 +335,7 @@ function HairMenuPanel:onJoypadDirLeft(joypadData)  self:stepCursor(-1) end
 function HairMenuPanel:onJoypadDirRight(joypadData) self:stepCursor(1)  end
 
 function HairMenuPanel:onJoypadDirDown(joypadData)
+	self:ensureCursor()
 	local i = self.joypadCursor + self.gridCols
 	if predicateAvatarIsSelectable(self.avatarList[i]) then
 		self:setCursor(i)
@@ -296,6 +343,7 @@ function HairMenuPanel:onJoypadDirDown(joypadData)
 end
 
 function HairMenuPanel:onJoypadDirUp(joypadData)
+	self:ensureCursor()
 	local i = self.joypadCursor - self.gridCols
 	if predicateAvatarIsSelectable(self.avatarList[i]) then
 		self:setCursor(i)
