@@ -1,3 +1,8 @@
+--[[ 
+	Provides joypad support by inserting the menu as a button in the ui and
+	forwarding input from the character panel to the menu.
+ ]]
+
 -- We overwrite this to replace the old combo with the menu in the joypad order
 function CharacterCreationMainCharacterPanel:loadJoypadButtons(joypadData)
 	joypadData = joypadData or self.joyfocus

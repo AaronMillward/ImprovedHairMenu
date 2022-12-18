@@ -1,3 +1,9 @@
+--[[ 
+	Adds settings for the mod.
+
+	Optionally provides support for ModOptions to allow users to change these settings.
+ ]]
+
 ImprovedHairMenu = ImprovedHairMenu or {}
 ImprovedHairMenu.settings = ImprovedHairMenu.SETTINGS or {}
 

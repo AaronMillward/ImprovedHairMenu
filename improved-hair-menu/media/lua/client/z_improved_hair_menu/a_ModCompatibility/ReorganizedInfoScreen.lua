@@ -1,5 +1,5 @@
 --[[
-	This restores the needed functionality to ISUI3DModel.
+	Restores the needed functionality to ISUI3DModel.
 	Reorganized Info Screen overwrites the base ISUI3DModel with an outdated version that doesn't have drag support.
 	to fix this we reload the definition of ISUI3DModel once RIS has loaded
 ]]

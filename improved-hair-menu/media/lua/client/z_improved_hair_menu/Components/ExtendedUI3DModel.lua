@@ -1,6 +1,7 @@
 --[[
 	This is a UI element that extends ISUI3DModel with click detection
 ]]
+
 require("ISUI/ISUI3DModel")
 local base = ISUI3DModel
 ISUI3DModelExt = base:derive("ISUI3DModelExt")

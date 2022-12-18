@@ -1,5 +1,6 @@
 --[[
-	This is where a bulk of the menu resides.
+	This is the actual menu element.
+
 	By being a separate UI element it can be implemented in both the character creation menu and in-game hair options.
 ]]
 

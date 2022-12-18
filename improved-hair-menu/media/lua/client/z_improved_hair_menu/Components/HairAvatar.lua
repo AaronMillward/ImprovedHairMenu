@@ -1,7 +1,5 @@
 --[[
 	This is a UI element that previews a hair style.
-
-	It extends ISUI3DModel with click detection and can show a given hair style id
 ]]
 
 local texture_scissors = getTexture("media/ui/Scissors.png")
