@@ -243,7 +243,7 @@ function CharacterCreationMain:createBeardTypeBtn()
 	if use_modal then
 		local function showMenu(target)
 			target.beardMenuButton.expanded = true
-			target.beardMenuButton.attachedMenu = target.beardMenu
+			target.beardMenuButton.attachedMenu:setJoypadFocused(true, nil)
 			target:removeChild(target.beardMenu)
 			target:addChild(target.beardMenu)
 			target.beardMenu:setX( (target:getWidth()/2) - (target.beardMenu:getWidth()/2) )
@@ -255,6 +255,7 @@ function CharacterCreationMain:createBeardTypeBtn()
 			self:removeChild(self.beardMenu)
 			self.beardMenu:setCapture(false)
 			self.beardMenuButton.expanded = false
+			self.beardMenuButton.attachedMenu:setJoypadFocused(false, nil)
 		end
 
 		self.beardMenuButton = ISButton:new(self.xOffset, self.yOffset, 90, FONT_HGT_SMALL*2, getText("IGUI_Open"), self, showMenu)
@@ -263,6 +264,18 @@ function CharacterCreationMain:createBeardTypeBtn()
 		self.beardMenuButton.isHairMenuButton = true
 		self.beardMenuButton.isButton = nil -- NOTE: We don't want this button to be picked up by the vanilla joypad functions
 		self.beardMenuButton.expanded = false
+		self.beardMenuButton.attachedMenu = self.beardMenu
+		local setJoypadFocused = self.beardMenuButton.setJoypadFocused
+		self.beardMenuButton.setJoypadFocused = function(self, focused, joypadData)
+			-- XXX: Do we close the dialog if the button loses focus?
+			self.focused = focused
+			if self.expanded then
+				self.attachedMenu:setJoypadFocused(focused, joypadData)
+			else
+				self.attachedMenu:setJoypadFocused(false, joypadData)
+			end
+			setJoypadFocused(self, focused, joypadData)
+		end
 		self.characterPanel:addChild(self.beardMenuButton)
 
 		self.yOffset = self.yOffset + self.beardMenuButton:getHeight() + 5;
