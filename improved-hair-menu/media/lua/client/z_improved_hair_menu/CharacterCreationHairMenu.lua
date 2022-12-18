@@ -198,7 +198,8 @@ function CharacterCreationMain:createHairTypeBtn()
 	if use_modal then
 		local function showMenu(target)
 			target.hairMenuButton.expanded = true
-			target.hairMenuButton.attachedMenu = target.hairMenu
+			target.hairMenuButton.attachedMenu:setJoypadFocused(true, nil)
+			
 			target:removeChild(target.hairMenu)
 			target:addChild(target.hairMenu)
 			target.hairMenu:setX( (target:getWidth()/2) - (target.hairMenu:getWidth()/2) )
@@ -210,6 +211,7 @@ function CharacterCreationMain:createHairTypeBtn()
 			self:removeChild(self.hairMenu)
 			self.hairMenu:setCapture(false)
 			self.hairMenuButton.expanded = false
+			self.hairMenuButton.attachedMenu:setJoypadFocused(false, nil)
 		end
 
 		self.hairMenuButton = ISButton:new(self.xOffset, self.yOffset, 90, FONT_HGT_SMALL*2, getText("IGUI_Open"), self, showMenu)
@@ -218,6 +220,18 @@ function CharacterCreationMain:createHairTypeBtn()
 		self.hairMenuButton.isHairMenuButton = true
 		self.hairMenuButton.isButton = nil -- We don't want this button to be picked up by the vanilla joypad functions
 		self.hairMenuButton.expanded = false
+		self.hairMenuButton.attachedMenu = self.hairMenu
+		local setJoypadFocused = self.hairMenuButton.setJoypadFocused
+		self.hairMenuButton.setJoypadFocused = function(self, focused, joypadData)
+			-- XXX: Do we close the dialog if the button loses focus?
+			self.focused = focused
+			if self.expanded then
+				self.attachedMenu:setJoypadFocused(focused, joypadData)
+			else
+				self.attachedMenu:setJoypadFocused(false, joypadData)
+			end
+			setJoypadFocused(self, focused, joypadData)
+		end
 		self.characterPanel:addChild(self.hairMenuButton)
 
 		self.yOffset = self.yOffset + self.hairMenuButton:getHeight() + 5;
