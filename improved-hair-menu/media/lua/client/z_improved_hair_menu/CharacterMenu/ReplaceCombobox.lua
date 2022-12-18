@@ -17,7 +17,7 @@ local FONT_HGT_SMALL = getTextManager():getFontHeight(UIFont.Small)
 local FONT_HGT_MEDIUM = getTextManager():getFontHeight(UIFont.Medium)
 
 local function is_low_res()
-	--[[
+	--[[ NOTE:
 		786 is what I've seen in a lot of vanilla code,
 		I'm not certain of its significance but I think it's a common laptop resolution
 
@@ -50,7 +50,7 @@ function CharacterCreationMain:createHairTypeBtn()
 	self.characterPanel:addChild(self.hairTypeCombo)
 	self.hairTypeCombo:setVisible(false);
 	self.hairType = 0
-	--Don't increment the y offset here, the combo is invisible and the menu takes its place
+	-- NOTE: Don't increment the y offset here, the combo is invisible and the menu takes its place
 
 	local panelType = nil
 
@@ -63,7 +63,7 @@ function CharacterCreationMain:createHairTypeBtn()
 	local menu_size = ImprovedHairMenu.settings:get_menu_size(false)
 
 	self.hairMenu = panelType:new(self.xOffset, self.yOffset, avatar_size,avatar_size, menu_size.cols,menu_size.rows, 3, false)
-	self.hairMenu.onSelect = function(info) -- INFO: Taken from onHairTypeSelected which requires the combobox as a parameter so obviously can't be used here.
+	self.hairMenu.onSelect = function(info) -- NOTE: Taken from onHairTypeSelected which requires the combobox as a parameter so obviously can't be used here.
 		local desc = MainScreen.instance.desc
 		self.hairType = 1 -- XXX: I don't really know if this is important or not but this seems to work.
 		desc:getHumanVisual():setHairModel(info.id) -- TODO: vanilla also allows this to be nil
@@ -96,7 +96,7 @@ function CharacterCreationMain:createHairTypeBtn()
 		self.hairMenuButton:initialise()
 		self.hairMenuButton:instantiate()
 		self.hairMenuButton.isHairMenuButton = true
-		self.hairMenuButton.isButton = nil -- We don't want this button to be picked up by the vanilla joypad functions
+		self.hairMenuButton.isButton = nil -- NOTE: We don't want this button to be picked up by the vanilla joypad functions
 		self.hairMenuButton.expanded = false
 		self.hairMenuButton.attachedMenu = self.hairMenu
 		local setJoypadFocused = self.hairMenuButton.setJoypadFocused
@@ -149,7 +149,7 @@ function CharacterCreationMain:createHairTypeBtn()
 	self.colorPickerHair.resetFocusTo = self.characterPanel
 	self.colorPickerHair:setColors(hairColors1, math.min(#hairColors1, 10), math.ceil(#hairColors1 / 10))
 
-	--We override these picker functions so that we can disable mouse capture
+	-- NOTE: We override these picker functions so that we can disable mouse capture
 	local colorPickerHair_picked = self.colorPickerHair.picked
 	function self.colorPickerHair:picked(hide)
 		colorPickerHair_picked(self, hide)
@@ -221,7 +221,7 @@ function CharacterCreationMain:createBeardTypeBtn()
 	self.characterPanel:addChild(self.beardTypeCombo)
 
 
-	--The following is copied from above, it only appears in these two places so I'm not making it a function
+	-- NOTE: The following is copied from above, it only appears in these two places so I'm not making it a function
 
 	local panelType = nil
 	if use_modal then
@@ -231,7 +231,7 @@ function CharacterCreationMain:createBeardTypeBtn()
 	end
 	local menu_size = ImprovedHairMenu.settings:get_menu_size(true)
 	self.beardMenu = panelType:new(self.xOffset, self.yOffset, avatar_size,avatar_size, menu_size.cols,menu_size.rows, 3, true)
-	self.beardMenu.onSelect = function(info) -- INFO: See `hairMenu` `onSelect` for more info
+	self.beardMenu.onSelect = function(info) -- NOTE: See above `hairMenu`'s `onSelect` for more info
 		local desc = MainScreen.instance.desc
 		desc:getHumanVisual():setBeardModel(info.id)
 		CharacterCreationHeader.instance.avatarPanel:setSurvivorDesc(desc)
@@ -261,7 +261,7 @@ function CharacterCreationMain:createBeardTypeBtn()
 		self.beardMenuButton:initialise()
 		self.beardMenuButton:instantiate()
 		self.beardMenuButton.isHairMenuButton = true
-		self.beardMenuButton.isButton = nil -- We don't want this button to be picked up by the vanilla joypad functions
+		self.beardMenuButton.isButton = nil -- NOTE: We don't want this button to be picked up by the vanilla joypad functions
 		self.beardMenuButton.expanded = false
 		self.characterPanel:addChild(self.beardMenuButton)
 

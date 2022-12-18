@@ -86,28 +86,19 @@ function HairAvatar:setHairInfo(args)
 end
 
 function HairAvatar:applyHair()
-	--[[
-		~~
-		Either I don't understand how survivordesc works or this is a bug.
+	--[[ XXX:
+		The getter and setter functions will affect the visual for all other avatars. this is due
+		to the visual being a table which is passed by reference in lua. this means we have to revert
+		any changes made while we're in here.
 
-		Lua passes tables by reference so I expect calling setHairModel() should set the hair for all hairavatars using this description
-		but it doesn't... the hair menu avatars clearly all have different hair styles.
+		This still works because when passing the visual to the 3D element the java side makes a copy
+		instead of referencing the table.
+	 ]]
 
-		This isn't ideal but it works. the caller just has to store the original hair to revert the changes made to the desc here.
-		~~
-
-		This is wrong, all descriptions are changed by setHairModel() however,
-		it appears the 3D ui element makes a copy of the description instead of referencing it.
-
-		There's no need to revert anymore because this function reverts the desc to it's original state itself.
-
-		In and ideal scenario we copy the description to avoid editing the one we are passed but I've got no idea how to do that from Lua.
-	]]
-
-	--[[ 2022-02-26
-		It has to be done like this with 2 separate variables for the char/desc, compairing the java types of 1 object doesn't work everywhere
-
-		I've just thought of the reason for this, using `:getClass():getName()` is probably very dependent on java environment
+	--[[ XXX:
+		It has to be done like this with 2 separate variables for the char/desc. we can't seem to pass
+		the char/desc as a parameter because comparing the java types doesn't work everywhere.
+		Possibly something to do with java environment?
 	 ]]
 
 	local visual = nil
@@ -120,35 +111,36 @@ function HairAvatar:applyHair()
 		return
 	end
 
-	local original_getter = nil
-	local original_setter = nil
+	local getter = nil
+	local setter = nil
 
 	if self.isBeard then
-		original_getter = visual.getBeardModel
-		original_setter = visual.setBeardModel
+		getter = visual.getBeardModel
+		setter = visual.setBeardModel
 	else
-		original_getter = visual.getHairModel
-		original_setter = visual.setHairModel
+		getter = visual.getHairModel
+		setter = visual.setHairModel
 	end
 
-	local original_hair = original_getter(visual)
+	local original_hair = getter(visual)
 
 	if self.hairInfo and self.hairInfo.id then
-		original_setter(visual, self.hairInfo.id)
+		setter(visual, self.hairInfo.id)
 	end
 	
-	--This appears to copy the desc likely because ISUI3DModel has a java call that probably copies the table by into an object
+	-- NOTE: This appears to copy the data likely because ISUI3DModel has a java call that copies the table into an object
 	if self.desc then 
 		self:setSurvivorDesc(self.desc)
 	elseif self.char then
 		self:setCharacter(self.char)
 	end
 
-	original_setter(visual, original_hair)
+	setter(visual, original_hair)
 end
 
 function HairAvatar:select()
 	-- NOTE: Don't allow selection of hairs missing a requirement.
+	-- XXX: This is only used by the in-game menu, maybe the in-game should override this function instead?
 	if self.hairInfo.requirements then
 		if self.hairInfo.requirements.scissors == false then return end
 		if self.hairInfo.requirements.scissors == false and self.hairInfo.requirements.razor == false then return end -- HACK: Razor only appears along side scissors in an OR relationship

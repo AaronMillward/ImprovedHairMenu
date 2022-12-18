@@ -12,20 +12,23 @@ function CharacterCreationMain:disableBtn()
 	--Generate Hair List
 	--##################
 
-	--[[ 
+	--[[ NOTE:
 		Originally we read this data out of the combobox but this is making things increasingly difficult.
 		With this change the menu can become indepenedent of the original UI.
 	 ]]
 	
 	local desc = MainScreen.instance.desc
 	if self.female ~= desc:isFemale() or CharacterCreationMain.forceUpdateCombo then
-		-- Don't do this, the vanilla function will handle it.
+		-- NOTE: We don't do this because the vanilla function will handle it.
 		-- CharacterCreationMain.forceUpdateCombo = false;
 
-		-- Replaces "self.female" in this block as vanilla also does this same sex switch check. so if we overwrite it here it will break vanilla.
+		-- NOTE: Replaces "self.female" in this block as vanilla also does this same sex switch check. so if we overwrite it here it will break vanilla.
 		local female = desc:isFemale()
 		
-		-- Get Hair Info
+		--#############
+		--Get Hair Info
+		--#############
+
 		local infoHair = {}
 		local hairStyles = getAllHairStyles(desc:isFemale())
 		for i=1,hairStyles:size() do
@@ -48,7 +51,10 @@ function CharacterCreationMain:disableBtn()
 
 		if self.hairMenu then self.hairMenu:setHairList(infoHair) end
 		
-		-- Get Beard Info
+		--##############
+		--Get Beard Info
+		--##############
+
 		local infoBeard = {}
 		if desc:isFemale() then
 			-- no bearded ladies
@@ -75,7 +81,7 @@ function CharacterCreationMain:disableBtn()
 	--Call Vanilla disableBtn
 	--#######################
 
-	--[[ 
+	--[[ NOTE:
 		When the game updates disableBtn will break due to elements changing causing calls on nil tables in disableBtn.
 		If we catch the error here, it will not propegate and break the whole main menu.
 	 ]]
@@ -85,14 +91,14 @@ function CharacterCreationMain:disableBtn()
 	--Set Visibility
 	--##############
 
-	--Base sets these depending on gender, we don't need them at all.
+	-- NOTE: Base sets these depending on gender, we don't need them at all.
 	if self.beardTypeLbl    then self.beardTypeLbl:setVisible(false)    end
 	if self.beardTypeCombo  then self.beardTypeCombo:setVisible(false)  end
 	if self.hairStubbleLbl  then self.hairStubbleLbl:setVisible(false)  end
 	if self.beardStubbleLbl then self.beardStubbleLbl:setVisible(false) end
 
 	if self.hairMenu then
-		-- hairMenu's onSelect triggers disableBtn so we need to set the selection silently to avoid an infinite loop
+		-- NOTE: hairMenu's onSelect triggers disableBtn so we need to set the selection silently to avoid an infinite loop
 		self.hairMenu:setSelectedInfo(self.hairMenu.info[self.hairTypeCombo.selected])
 	end
 

@@ -38,7 +38,7 @@ function HairMenuPanel:new(x, y, size_x, size_y, rows, cols, gap, isBeard)
 	gap    = gap or 3
 
 	local o = base.new(self, x, y, (size_x * cols) + (gap * (cols-1)) , (size_y * rows) + (gap * (rows-1)) + header_height)
-	o.isHairMenu = true -- Used by panels to determine type for passing in events
+	o.isHairMenu = true -- Used by panels to determine element type.
 	o.gridSizeX = size_x
 	o.gridSizeY = size_y
 	o.gridRows   = rows
@@ -76,8 +76,13 @@ function HairMenuPanel:initialise()
 	self.pageRightButton:setImage(getTexture("media/ui/ArrowRight.png"))
 	self:addChild(self.pageRightButton)
 
-	--Here we create the styles page, note that there is only one page of avatars. 
-	--this is to reduce the number of 3d models by loading the hairs onto these avatars when switching pages
+	--[[ NOTE:
+		Here we create the page, there is only one page of avatars to reduce
+		the number of 3d models.
+		
+		By loading the hairs onto these avatars when switching pages we 
+		can save some resources.
+	 ]]
 
 	self.offset_y = self.offset_y + 20
 	for h=1,self.gridRows do
@@ -126,7 +131,7 @@ end
 
 -- Silently updates the hair info selection, avoiding triggering the `onSelect` callback which can cause infinite loops.
 function HairMenuPanel:setSelectedInfo(hairInfo)
-	-- This function has to allow for nil as beard menus might be initialized to nil if starting with a female character.
+	-- XXX: This function has to allow for nil as beard menus might be initialized to nil if starting with a female character.
 	if self.selectedHairInfo then self.selectedHairInfo.selected = false end
 	self.selectedHairInfo = hairInfo
 	if self.selectedHairInfo then self.selectedHairInfo.selected = true end
@@ -276,7 +281,7 @@ function HairMenuPanel:stepCursor(direction)
 
 	local direction = ImprovedHairMenu.math.sign(direction)
 
-	-- INFO: `stepCursor` is only called by joypad events we don't need any flags for joypad usage
+	-- NOTE: `stepCursor` is only called by joypad events we don't need any flags for joypad usage
 	if direction ~= 0 then
 		if self.joypadCursor + direction > self:getCurrentPageSize() then
 			self:changePage(1)
@@ -300,6 +305,7 @@ function HairMenuPanel:isNextDownOutside()
 	return not predicateAvatarIsSelectable(self.avatarList[self.joypadCursor + self.gridCols])
 end
 
+-- Determines if the next joypad press should move outside the menu
 function HairMenuPanel:isNextUpOutside()
 	if not self.joypadCursor then
 		return true

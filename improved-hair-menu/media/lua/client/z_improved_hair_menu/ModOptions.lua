@@ -65,7 +65,7 @@ if ModOptions and ModOptions.getInstance then
 	ImprovedHairMenu.settings = SETTINGS.options
 end
 
---We put these after so they apply to both with and without ModOptions tables
+-- NOTE: We put these after so they apply to both with and without ModOptions tables
 
 function ImprovedHairMenu.settings:get_avatar_size()
 	return 32 + ((self.avatar_size-1) * 16)

@@ -1,11 +1,12 @@
 --[[
 	Restores the needed functionality to ISUI3DModel.
 	Reorganized Info Screen overwrites the base ISUI3DModel with an outdated version that doesn't have drag support.
-	to fix this we reload the definition of ISUI3DModel once RIS has loaded
+	to fix this we reload the definition of ISUI3DModel once RIS has loaded.
 ]]
 
-if ISUI3DModel.setCoords then --This is a function added by RIS
-	--The vanilla implementation
+-- NOTE: This is a function added by RIS, we're checking if the mod is enabled.
+if ISUI3DModel.setCoords then 
+	-- NOTE: The following is the vanilla implementation.
 
 	--***********************************************************
 	--**                    THE INDIE STONE                    **

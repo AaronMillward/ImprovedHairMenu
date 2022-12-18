@@ -21,7 +21,7 @@ function ISUI3DModelExt:prerender()
 end
 
 function ISUI3DModelExt:onMouseMove(dx, dy)
-	-- This is mostly repeated but it preserves the vanilla code
+	-- NOTE: This is mostly repeated but it preserves the vanilla code
 	if self.mouseDown then
 		if math.abs(self.dragX + dx) > 40 then
 			self.hasDragged = true
