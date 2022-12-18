@@ -95,24 +95,36 @@ function HairMenuPanel:initialise()
 			hairAvatar:initialise()
 			hairAvatar:instantiate()
 			hairAvatar:setVisible(true)
+			hairAvatar.panelIndex = idx
 			hairAvatar.onSelect = function(hairAvatar)
 				self:onAvatarSelect(hairAvatar)
 			end
-			local old_onMouseMove = hairAvatar.onMouseMove
+
 			hairAvatar.onMouseMove = function(avatar, x, y)
-				old_onMouseMove(avatar, x, y)
+				HairAvatar.onMouseMove(avatar, x, y)
 				--[[ NOTE:XXX:
 					There used to be a `containsPoint` check here. it only worked on the main menu or in-game depending on who called `containsPoint`
 					but `onMouseMove` only gets called if the mouse is inside the element anyway so it already fulfilled the purpose of the check.
 				 ]]
-				self:setCursor(idx)
+
+				--[[ XXX:
+					It seems like it's not possible to make dragging not change the tooltip. I think the onMouseMove functions
+					aren't being called correctly leading to weird behaviour.
+					
+					ISUI3DModel has this comment in the onMouseMoveOutside function
+					"This shouldn't happen, but the way setCapture() works is broken."
+					
+					So I don't think this one is on me.
+				 ]]
+
+				self:setCursor(avatar.panelIndex)
 			end
-			local old_onMouseMoveOutside = hairAvatar.onMouseMoveOutside
+
+			-- NOTE: If this avatar is the cursor then it should set let the panel know when it loses focus.
 			hairAvatar.onMouseMoveOutside = function(avatar, x, y)
-				-- NOTE: If this avatar is the cursor then it should set let the panel know when it loses focus.
-				old_onMouseMoveOutside(avatar, x, y)
+				HairAvatar.onMouseMoveOutside(avatar, x, y)
 				if self.joypadFocus then return end
-				if self.joypadCursor == idx then
+				if self.joypadCursor == avatar.panelIndex then
 					self:setCursor(nil)
 				end
 			end
