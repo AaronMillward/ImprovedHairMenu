@@ -2,6 +2,7 @@
 	This is a UI element that extends ISUI3DModel with click detection
 ]]
 
+require("z_improved_hair_menu/ModCompatibility/ReorganizedInfoScreen.lua")
 require("ISUI/ISUI3DModel")
 local base = ISUI3DModel
 ISUI3DModelExt = base:derive("ISUI3DModelExt")

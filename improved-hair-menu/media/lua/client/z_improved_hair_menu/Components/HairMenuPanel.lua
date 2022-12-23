@@ -91,7 +91,7 @@ function HairMenuPanel:initialise()
 			
 			local x = ((v-1) * self.gridSizeX) + (self.gap*(v-1))
 			local y = (self.offset_y + ((h-1) * self.gridSizeY)) + (self.gap*(h-1))
-			local hairAvatar = HairAvatar:new(x, y, self.gridSizeX, self.gridSizeY, self.isBeard)
+			local hairAvatar = HairAvatar:new(x, y, self.gridSizeX, self.gridSizeY)
 			hairAvatar:initialise()
 			hairAvatar:instantiate()
 			hairAvatar:setVisible(true)
@@ -138,7 +138,7 @@ function HairMenuPanel:initialise()
 end
 
 function HairMenuPanel:onAvatarSelect(hairAvatar)
-	self:selectInfo(hairAvatar.hairInfo)
+	self:selectInfo(hairAvatar.visualItem)
 end
 
 -- Silently updates the hair info selection, avoiding triggering the `onSelect` callback which can cause infinite loops.
