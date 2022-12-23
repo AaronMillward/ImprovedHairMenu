@@ -1,4 +1,4 @@
-
+require("z_improved_hair_menu/Components/VisualAvatar")
 
 HairAvatar = VisualAvatar:derive("HairAvatar")
 

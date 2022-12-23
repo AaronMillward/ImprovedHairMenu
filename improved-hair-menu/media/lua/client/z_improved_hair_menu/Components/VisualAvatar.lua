@@ -2,6 +2,8 @@
 	This is a UI element that previews a HumanVisual change.
 ]]
 
+require("z_improved_hair_menu/Components/ExtendedUI3DModel")
+
 VisualAvatar = ISUI3DModelExt:derive("VisualAvatar")
 
 function VisualAvatar:new(x, y, width, height)
