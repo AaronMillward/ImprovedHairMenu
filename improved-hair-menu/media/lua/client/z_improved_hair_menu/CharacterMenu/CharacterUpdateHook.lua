@@ -15,10 +15,10 @@ end
 
 function CharacterCreationMain:ihm_update_preview_model(desc)
 	if self.hairMenu then 
-		self.hairMenu:applyHair()
+		self.hairMenu:applyVisual()
 	end
 
 	if self.beardMenu then 
-		self.beardMenu:applyHair()
+		self.beardMenu:applyVisual()
 	end
 end

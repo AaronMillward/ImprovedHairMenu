@@ -87,6 +87,8 @@ function ISCharacterScreen:hairMenu(button)
 					table.insert(tie_options, {
 						id = hairStyle:getName(),
 						display = getText("IGUI_Hair_" .. hairStyle:getName()),
+						getterName = "getHairModel",
+						setterName = "setHairModel",
 						selected = false,
 						requirements = nil,
 						actionTime = 100, 
@@ -115,6 +117,8 @@ function ISCharacterScreen:hairMenu(button)
 				local info = {
 					id = hairStyle:getName(),
 					display = getText("IGUI_Hair_" .. hairStyle:getName()),
+					getterName = "getHairModel",
+					setterName = "setHairModel",
 					selected = false,
 					requirements = {},
 					actionTime = 300,
@@ -197,6 +201,8 @@ function ISCharacterScreen:beardMenu(button)
 			id = "",
 			display = "ContextMenu_TrimBeard",
 			selected = false,
+			getterName = "getBeardModel",
+			setterName = "setBeardModel",
 			requirements = {
 				razor = player:getInventory():containsEvalRecurse(predicateRazor),
 				scissors = player:getInventory():containsEvalRecurse(predicateScissors),
@@ -206,6 +212,8 @@ function ISCharacterScreen:beardMenu(button)
 			table.insert(options, {
 				id = style:getName(),
 				display = getText("IGUI_Beard_" .. style:getName()),
+				getterName = "getBeardModel",
+				setterName = "setBeardModel",
 				selected = false,
 				requirements = {
 					razor = player:getInventory():containsEvalRecurse(predicateRazor),

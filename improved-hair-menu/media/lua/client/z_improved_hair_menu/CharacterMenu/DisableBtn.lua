@@ -45,6 +45,8 @@ function CharacterCreationMain:disableBtn()
 					id = hairStyles:get(i-1),
 					display = label,
 					selected = false,
+					getterName = "getHairModel",
+					setterName = "setHairModel",
 				})
 			end
 		end
@@ -71,6 +73,8 @@ function CharacterCreationMain:disableBtn()
 					id = beardStyles:get(i-1),
 					display = label,
 					selected = false,
+					getterName = "getBeardModel",
+					setterName = "setBeardModel",
 				})
 			end
 			if self.beardMenu then self.beardMenu:setHairList(infoBeard) end

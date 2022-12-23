@@ -168,9 +168,9 @@ function HairMenuPanel:setChar(desc)
 	end
 end
 
-function HairMenuPanel:applyHair(desc)
+function HairMenuPanel:applyVisual(desc)
 	for i=1,#self.avatarList do
-		self.avatarList[i]:applyHair()
+		self.avatarList[i]:applyVisual()
 	end
 end
 
@@ -219,8 +219,8 @@ function HairMenuPanel:showPage(page_number)
 		local info = self.info[((page_number-1) * self.pageSize) + i]
 		if info then 
 			self.avatarList[i].selectable = true
-			self.avatarList[i]:setHairInfo(info)
-			self.avatarList[i]:applyHair()
+			self.avatarList[i]:setVisualItem(info)
+			self.avatarList[i]:applyVisual()
 			self.avatarList[i]:setVisible(true)
 		else
 			self.avatarList[i].selectable = false
