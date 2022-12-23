@@ -199,7 +199,7 @@ function ISCharacterScreen:beardMenu(button)
 
 		table.insert(options, {
 			id = "",
-			display = "ContextMenu_TrimBeard",
+			display = getText("IGUI_Beard_None"),
 			selected = false,
 			getterName = "getBeardModel",
 			setterName = "setBeardModel",
