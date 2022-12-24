@@ -194,7 +194,7 @@ function ISCharacterScreen:beardMenu(button)
 		end
 		-- add other special trim (a goatee can become a moustache, etc.)
 		for i=0, currentBeardStyle:getTrimChoices():size()-1 do
-			table.insert(all_stlyes, currentBeardStyle:getTrimChoices():get(i))
+			table.insert(all_stlyes, getBeardStylesInstance():FindStyle(currentBeardStyle:getTrimChoices():get(i)))
 		end
 
 		table.insert(options, {
