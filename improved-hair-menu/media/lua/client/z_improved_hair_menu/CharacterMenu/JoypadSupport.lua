@@ -73,7 +73,7 @@ local original_onJoypadDown = CharacterCreationMainCharacterPanel.onJoypadDown
 function CharacterCreationMainCharacterPanel:onJoypadDown(button, joypadData)
 	local children = self:getVisibleChildren(self.joypadIndexY)
 	local child = children[self.joypadIndex]
-	if child and child.isHairMenuButton then
+	if child and child.isAvatarMenu then
 		if child.expanded == false then
 			if button == Joypad.AButton then
 				child:forceClick()
@@ -87,7 +87,7 @@ function CharacterCreationMainCharacterPanel:onJoypadDown(button, joypadData)
 				child.attachedMenu:onJoypadDown(button, joypadData)
 			end
 		end
-	elseif child and child.isHairMenu then
+	elseif child and child.isAvatarMenu then
 		if button == Joypad.BButton then original_onJoypadDown(self, button, joypadData) return end
 		child:onJoypadDown(button, joypadData)
 	else
@@ -100,13 +100,13 @@ function CharacterCreationMainCharacterPanel:onJoypadDirLeft(joypadData)
 	local children = self:getVisibleChildren(self.joypadIndexY)
 	local child = children[self.joypadIndex]
 	
-	if child and child.isHairMenuButton then
+	if child and child.isAvatarMenuButton then
 		if child.expanded == false then
 			original_onJoypadDirLeft(self, joypadData)
 		else
 			child.attachedMenu:onJoypadDirLeft(joypadData)
 		end
-	elseif child and child.isHairMenu then
+	elseif child and child.isAvatarMenu then
 		child:onJoypadDirLeft(joypadData)
 	else
 		original_onJoypadDirLeft(self, joypadData)
@@ -117,13 +117,13 @@ local original_onJoypadDirRight = CharacterCreationMainCharacterPanel.onJoypadDi
 function CharacterCreationMainCharacterPanel:onJoypadDirRight(joypadData)
 	local children = self:getVisibleChildren(self.joypadIndexY)
 	local child = children[self.joypadIndex]
-	if child and child.isHairMenuButton then
+	if child and child.isAvatarMenuButton then
 		if child.expanded == false then
 			original_onJoypadDirRight(self, joypadData)
 		else
 			child.attachedMenu:onJoypadDirRight(joypadData)
 		end
-	elseif child and child.isHairMenu then
+	elseif child and child.isAvatarMenu then
 		child:onJoypadDirRight(joypadData)
 	else
 		original_onJoypadDirRight(self, joypadData)
@@ -133,13 +133,13 @@ end
 local old_onJoypadDirUp = CharacterCreationMainCharacterPanel.onJoypadDirUp
 function CharacterCreationMainCharacterPanel:onJoypadDirUp(joypadData)
 	local child = self:getVisibleChildren(self.joypadIndexY)[self.joypadIndex]
-	if child and child.isHairMenuButton then
+	if child and child.isAvatarMenuButton then
 		if child.expanded == true then
 			child.attachedMenu:onJoypadDirUp(joypadData)
 		else
 			old_onJoypadDirUp(self, joypadData)
 		end
-	elseif child and child.isHairMenu then
+	elseif child and child.isAvatarMenu then
 		if child:isNextUpOutside() then
 			old_onJoypadDirUp(self, joypadData)
 		else
@@ -153,13 +153,13 @@ end
 local old_onJoypadDirDown = CharacterCreationMainCharacterPanel.onJoypadDirDown
 function CharacterCreationMainCharacterPanel:onJoypadDirDown(joypadData)
 	local child = self:getVisibleChildren(self.joypadIndexY)[self.joypadIndex]
-	if child and child.isHairMenuButton then
+	if child and child.isAvatarMenuButton then
 		if child.expanded == true then
 			child.attachedMenu:onJoypadDirDown(joypadData)
 		else
 			old_onJoypadDirDown(self, joypadData)
 		end
-	elseif child and child.isHairMenu then
+	elseif child and child.isAvatarMenu then
 		if child:isNextDownOutside() then
 			old_onJoypadDirDown(self, joypadData)
 		else

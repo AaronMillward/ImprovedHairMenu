@@ -14,11 +14,12 @@ function CharacterCreationHeader:create()
 end
 
 function CharacterCreationMain:ihm_update_preview_model(desc)
-	if self.hairMenu then 
-		self.hairMenu:applyVisual()
+	for _,p in ipairs(self.ICSVisuals) do
+		p:applyVisual()
 	end
+end
 
-	if self.beardMenu then 
-		self.beardMenu:applyVisual()
-	end
+function CharacterCreationMain:ICSAddPanel(panel)
+	self.ICSVisuals = self.ICSVisuals or {}
+	table.insert(self.ICSVisuals, panel)
 end

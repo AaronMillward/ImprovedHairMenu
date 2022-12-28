@@ -72,6 +72,7 @@ function CharacterCreationMain:createHairTypeBtn()
 	end
 	self.hairMenu:initialise()
 	self.hairMenu:setDesc(MainScreen.instance.desc)
+	self:ICSAddPanel(self.hairMenu)
 	
 	if use_modal then
 		local function showMenu(target)
@@ -95,7 +96,7 @@ function CharacterCreationMain:createHairTypeBtn()
 		self.hairMenuButton = ISButton:new(self.xOffset, self.yOffset, 90, FONT_HGT_SMALL*2, getText("IGUI_Open"), self, showMenu)
 		self.hairMenuButton:initialise()
 		self.hairMenuButton:instantiate()
-		self.hairMenuButton.isHairMenuButton = true
+		self.hairMenuButton.isAvatarMenuButton = true
 		self.hairMenuButton.isButton = nil -- NOTE: We don't want this button to be picked up by the vanilla joypad functions
 		self.hairMenuButton.expanded = false
 		self.hairMenuButton.attachedMenu = self.hairMenu
@@ -239,6 +240,7 @@ function CharacterCreationMain:createBeardTypeBtn()
 	end
 	self.beardMenu:initialise()
 	self.beardMenu:setDesc(MainScreen.instance.desc)
+	self:ICSAddPanel(self.beardMenu)
 	
 	if use_modal then
 		local function showMenu(target)
@@ -261,7 +263,7 @@ function CharacterCreationMain:createBeardTypeBtn()
 		self.beardMenuButton = ISButton:new(self.xOffset, self.yOffset, 90, FONT_HGT_SMALL*2, getText("IGUI_Open"), self, showMenu)
 		self.beardMenuButton:initialise()
 		self.beardMenuButton:instantiate()
-		self.beardMenuButton.isHairMenuButton = true
+		self.beardMenuButton.isAvatarMenuButton = true
 		self.beardMenuButton.isButton = nil -- NOTE: We don't want this button to be picked up by the vanilla joypad functions
 		self.beardMenuButton.expanded = false
 		self.beardMenuButton.attachedMenu = self.beardMenu

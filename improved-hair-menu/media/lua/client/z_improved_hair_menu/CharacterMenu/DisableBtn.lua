@@ -51,7 +51,7 @@ function CharacterCreationMain:disableBtn()
 			end
 		end
 
-		if self.hairMenu then self.hairMenu:setHairList(infoHair) end
+		if self.hairMenu then self.hairMenu:setInfoTable(infoHair) end
 		
 		--##############
 		--Get Beard Info
@@ -77,7 +77,7 @@ function CharacterCreationMain:disableBtn()
 					setterName = "setBeardModel",
 				})
 			end
-			if self.beardMenu then self.beardMenu:setHairList(infoBeard) end
+			if self.beardMenu then self.beardMenu:setInfoTable(infoBeard) end
 		end
 	end
 

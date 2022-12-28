@@ -34,7 +34,7 @@ function HairMenuPanelWindow:createChildren()
 	self.hairPanel.onSelect = function(select_name)
 		self.onSelect(select_name)
 	end
-	self.hairPanel:setHairList(self.hairList)
+	self.hairPanel:setInfoTable(self.hairList)
 	self:addChild(self.hairPanel)
 
 	self:setWidth(self.hairPanel:getWidth())
