@@ -52,17 +52,24 @@ function CharacterCreationMain:createHairTypeBtn()
 	self.hairType = 0
 	-- NOTE: Don't increment the y offset here, the combo is invisible and the menu takes its place
 
-	local panelType = nil
-
+	local menu_size = ImprovedHairMenu.settings:get_menu_size(false)
+	
 	if use_modal then
-		panelType = HairMenuPanelModal
+		self.hairMenuButton = MenuPanelButton:new(self.xOffset, self.yOffset, 90, FONT_HGT_SMALL*2, getText("IGUI_Open"), nil, HairMenuPanel, avatar_size, avatar_size, menu_size.cols, menu_size.rows, 3, true)
+		self.hairMenuButton:initialise()
+		self.hairMenuButton:instantiate()
+		self.characterPanel:addChild(self.hairMenuButton)
+		self.yOffset = self.yOffset + self.hairMenuButton:getHeight() + 5;
+
+		self.hairMenu = self.hairMenuButton.attachedPanel
 	else
-		panelType = HairMenuPanel
+		self.hairMenu = HairMenuPanel:new(self.xOffset, self.yOffset, avatar_size,avatar_size, menu_size.cols,menu_size.rows, 3, false)
+		self.hairMenu:initialise()
+		
+		self.characterPanel:addChild(self.hairMenu)
+		self.yOffset = self.yOffset + self.hairMenu:getHeight() + 5;
 	end
 
-	local menu_size = ImprovedHairMenu.settings:get_menu_size(false)
-
-	self.hairMenu = panelType:new(self.xOffset, self.yOffset, avatar_size,avatar_size, menu_size.cols,menu_size.rows, 3, false)
 	self.hairMenu.onSelect = function(info) -- NOTE: Taken from onHairTypeSelected which requires the combobox as a parameter so obviously can't be used here.
 		local desc = MainScreen.instance.desc
 		self.hairType = 1 -- XXX: I don't really know if this is important or not but this seems to work.
@@ -70,56 +77,9 @@ function CharacterCreationMain:createHairTypeBtn()
 		CharacterCreationHeader.instance.avatarPanel:setSurvivorDesc(desc)
 		self:disableBtn()
 	end
-	self.hairMenu:initialise()
 	self.hairMenu:setDesc(MainScreen.instance.desc)
 	self:ICSAddPanel(self.hairMenu)
-	
-	if use_modal then
-		local function showMenu(target)
-			target.hairMenuButton.expanded = true
-			target.hairMenuButton.attachedMenu:setJoypadFocused(true, nil)
-			
-			target:removeChild(target.hairMenu)
-			target:addChild(target.hairMenu)
-			target.hairMenu:setX( (target:getWidth()/2) - (target.hairMenu:getWidth()/2) )
-			target.hairMenu:setY( (target:getHeight()/2) - (target.hairMenu:getHeight()/2) )
-			target.hairMenu:setCapture(true)
-		end
 
-		self.hairMenu.onClose = function()
-			self:removeChild(self.hairMenu)
-			self.hairMenu:setCapture(false)
-			self.hairMenuButton.expanded = false
-			self.hairMenuButton.attachedMenu:setJoypadFocused(false, nil)
-		end
-
-		self.hairMenuButton = ISButton:new(self.xOffset, self.yOffset, 90, FONT_HGT_SMALL*2, getText("IGUI_Open"), self, showMenu)
-		self.hairMenuButton:initialise()
-		self.hairMenuButton:instantiate()
-		self.hairMenuButton.isAvatarMenuButton = true
-		self.hairMenuButton.isButton = nil -- NOTE: We don't want this button to be picked up by the vanilla joypad functions
-		self.hairMenuButton.expanded = false
-		self.hairMenuButton.attachedMenu = self.hairMenu
-		local setJoypadFocused = self.hairMenuButton.setJoypadFocused
-		self.hairMenuButton.setJoypadFocused = function(self, focused, joypadData)
-			-- XXX: Do we close the dialog if the button loses focus?
-			self.focused = focused
-			if self.expanded then
-				self.attachedMenu:setJoypadFocused(focused, joypadData)
-			else
-				self.attachedMenu:setJoypadFocused(false, joypadData)
-			end
-			setJoypadFocused(self, focused, joypadData)
-		end
-		self.characterPanel:addChild(self.hairMenuButton)
-
-		self.yOffset = self.yOffset + self.hairMenuButton:getHeight() + 5;
-	else
-		self.characterPanel:addChild(self.hairMenu)
-		self.yOffset = self.yOffset + self.hairMenu:getHeight() + 5;
-	end
-	
-	
 	local xColor = 90;
 	
 	local hairColors = MainScreen.instance.desc:getCommonHairColor();
@@ -143,6 +103,7 @@ function CharacterCreationMain:createHairTypeBtn()
 	self.hairMenu.hairColorBtn = hairColorBtn
 	self.hairColorButton = hairColorBtn
 	
+	-- FIXME: Color picker is below menu
 	self.colorPickerHair = ISColorPicker:new(0, 0, nil)
 	self.colorPickerHair:initialise()
 	self.colorPickerHair.keepOnScreen = true
@@ -224,67 +185,32 @@ function CharacterCreationMain:createBeardTypeBtn()
 
 	-- NOTE: The following is copied from above, it only appears in these two places so I'm not making it a function
 
-	local panelType = nil
-	if use_modal then
-		panelType = HairMenuPanelModal
-	else
-		panelType = HairMenuPanel
-	end
 	local menu_size = ImprovedHairMenu.settings:get_menu_size(true)
-	self.beardMenu = panelType:new(self.xOffset, self.yOffset, avatar_size,avatar_size, menu_size.cols,menu_size.rows, 3, true)
+
+	if use_modal then
+		self.hairMenuButton = MenuPanelButton:new(self.xOffset, self.yOffset, 90, FONT_HGT_SMALL*2, getText("IGUI_Open"), nil, HairMenuPanel, avatar_size, avatar_size, menu_size.cols, menu_size.rows, 3, true)
+		self.hairMenuButton:initialise()
+		self.hairMenuButton:instantiate()
+		self.characterPanel:addChild(self.hairMenuButton)
+		self.yOffset = self.yOffset + self.hairMenuButton:getHeight() + 5;
+
+		self.beardMenu = self.hairMenuButton.attachedPanel
+	else
+		self.beardMenu = HairMenuPanel:new(self.xOffset, self.yOffset, avatar_size,avatar_size, menu_size.cols,menu_size.rows, 3, false)
+		self.beardMenu:initialise()
+		
+		self.characterPanel:addChild(self.beardMenu)
+		self.yOffset = self.yOffset + self.beardMenu:getHeight() + 5;
+	end
+
 	self.beardMenu.onSelect = function(info) -- NOTE: See above `hairMenu`'s `onSelect` for more info
 		local desc = MainScreen.instance.desc
 		desc:getHumanVisual():setBeardModel(info.id)
 		CharacterCreationHeader.instance.avatarPanel:setSurvivorDesc(desc)
 		self:disableBtn()
 	end
-	self.beardMenu:initialise()
 	self.beardMenu:setDesc(MainScreen.instance.desc)
 	self:ICSAddPanel(self.beardMenu)
-	
-	if use_modal then
-		local function showMenu(target)
-			target.beardMenuButton.expanded = true
-			target.beardMenuButton.attachedMenu:setJoypadFocused(true, nil)
-			target:removeChild(target.beardMenu)
-			target:addChild(target.beardMenu)
-			target.beardMenu:setX( (target:getWidth()/2) - (target.beardMenu:getWidth()/2) )
-			target.beardMenu:setY( (target:getHeight()/2) - (target.beardMenu:getHeight()/2) )
-			target.beardMenu:setCapture(true)
-		end
-
-		self.beardMenu.onClose = function()
-			self:removeChild(self.beardMenu)
-			self.beardMenu:setCapture(false)
-			self.beardMenuButton.expanded = false
-			self.beardMenuButton.attachedMenu:setJoypadFocused(false, nil)
-		end
-
-		self.beardMenuButton = ISButton:new(self.xOffset, self.yOffset, 90, FONT_HGT_SMALL*2, getText("IGUI_Open"), self, showMenu)
-		self.beardMenuButton:initialise()
-		self.beardMenuButton:instantiate()
-		self.beardMenuButton.isAvatarMenuButton = true
-		self.beardMenuButton.isButton = nil -- NOTE: We don't want this button to be picked up by the vanilla joypad functions
-		self.beardMenuButton.expanded = false
-		self.beardMenuButton.attachedMenu = self.beardMenu
-		local setJoypadFocused = self.beardMenuButton.setJoypadFocused
-		self.beardMenuButton.setJoypadFocused = function(self, focused, joypadData)
-			-- XXX: Do we close the dialog if the button loses focus?
-			self.focused = focused
-			if self.expanded then
-				self.attachedMenu:setJoypadFocused(focused, joypadData)
-			else
-				self.attachedMenu:setJoypadFocused(false, joypadData)
-			end
-			setJoypadFocused(self, focused, joypadData)
-		end
-		self.characterPanel:addChild(self.beardMenuButton)
-
-		self.yOffset = self.yOffset + self.beardMenuButton:getHeight() + 5;
-	else
-		self.characterPanel:addChild(self.beardMenu)
-		self.yOffset = self.yOffset + self.beardMenu:getHeight() + 5;
-	end
 
 	----------------------
 	-- STUBBLE

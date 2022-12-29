@@ -245,7 +245,7 @@ local opened_menu = nil
 
 function ISCharacterScreen:ihm_open_hair_menu(hair_options, title, isBeard)
 	local player = self.char
-	local menu = HairMenuPanelWindow:new(200,200,400,400, self.playerNum, self.char, hair_options, isBeard)
+	local menu = HairMenuPanelWindow:new(200,200,400,400, self.playerNum, self.char, hair_options)
 	menu.returnFocus = self
 	if isBeard == true then 
 		menu.onSelect = function(selection)

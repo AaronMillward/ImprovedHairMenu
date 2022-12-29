@@ -34,7 +34,7 @@ function CharacterCreationMain:createChestTypeBtn()
 	}
 	
 	local avatar_size = ImprovedHairMenu.settings:get_avatar_size()
-	self.skinColorButton = AvatarMenuPanelButton:new(self.xOffset+xColor, self.yOffset, 45, comboHgt, "", nil, avatar_size, avatar_size * 1.5, 1, 5, 3)
+	self.skinColorButton = MenuPanelButton:new(self.xOffset+xColor, self.yOffset, 45, comboHgt, "", nil, AvatarMenuPanel, avatar_size, avatar_size * 1.5, 1, 5, 3, false)
 	self.skinColorButton:initialise()
 	self.skinColorButton:instantiate()
 	local color = self.skinColors[1]

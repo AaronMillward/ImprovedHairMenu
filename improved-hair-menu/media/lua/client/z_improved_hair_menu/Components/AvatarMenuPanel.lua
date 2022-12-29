@@ -28,12 +28,13 @@ function AvatarMenuPanel:render()
 	end
 end
 
-function AvatarMenuPanel:new(x, y, size_x, size_y, rows, cols, gap)
+function AvatarMenuPanel:new(x, y, size_x, size_y, rows, cols, gap, isModal)
 	size_x = size_x or 96
 	size_y = size_y or 96
 	rows   = rows or 2
 	cols   = cols or 3
 	gap    = gap or 3
+	isModal = isModal or false
 
 	local o = base.new(self, x, y, (size_x * cols) + (gap * (cols-1)) , (size_y * rows) + (gap * (rows-1)) + header_height)
 	o.isAvatarMenu = true -- Used by panels to determine element type.
@@ -43,10 +44,12 @@ function AvatarMenuPanel:new(x, y, size_x, size_y, rows, cols, gap)
 	o.gridCols   = cols
 	o.pageSize = (rows * cols)
 	o.gap = gap
+	o.isModal = isModal
 	o.avatarList = {}
 	o.info = {} -- HairInfo stored here
 	o.pageCurrent = 1
 	o.onSelect = nil -- Callback
+	o.onWantsClose = nil -- Callback
 	o.showSelectedName = true
 	o.joypadCursor = 1
 	o.selectedInfo = {id = "", display = ""}
@@ -187,23 +190,21 @@ function AvatarMenuPanel:setInfoTable(table)
 	self:showPage(1)
 end
 
--- #
--- # Mouse movement
--- #
+-- ##################
+-- # Mouse Handling #
+-- ##################
 
 function AvatarMenuPanel:onMouseUp(x, y)
-	if not self.parentBtn then return end
+	if self.parentBtn then
+		if self.parentBtn.disabled then return end
+	end
 
-	if self.parentBtn.disabled then return end
-
-	if not self:isMouseOver() then -- due to setCapture()
-		self.parentBtn:hideMenu()
+	if self.joypadFocus then -- Don't use the mouse if we have joypad
 		return
 	end
-	
-	if not self.joypadFocus then
-		self.parentBtn:hideMenu()
-		return
+
+	if self.isModal and not self:isMouseOver() then -- due to setCapture()
+		if self.onWantsClose then self.onWantsClose() end
 	end
 end
 

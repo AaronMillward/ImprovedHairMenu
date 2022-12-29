@@ -14,10 +14,9 @@ end
 
 HairMenuPanel = AvatarMenuPanel:derive("HairMenuPanel")
 
-function HairMenuPanel:new(x, y, size_x, size_y, rows, cols, gap, isBeard)
-	local o = AvatarMenuPanel.new(self, x, y, size_x, size_y, rows, cols, gap)
+function HairMenuPanel:new(x, y, size_x, size_y, rows, cols, gap, isModal)
+	local o = AvatarMenuPanel.new(self, x, y, size_x, size_y, rows, cols, gap, isModal)
 	o.isHairMenu = true -- Used by panels to determine element type.
-	o.isBeard = isBeard
 	o.avatarElementType = HairAvatar
 	return o
 end

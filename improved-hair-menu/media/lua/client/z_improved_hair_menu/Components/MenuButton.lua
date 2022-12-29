@@ -1,20 +1,23 @@
-AvatarMenuPanelButton = ISButton:derive("AvatarMenuPanelButton")
+MenuPanelButton = ISButton:derive("MenuPanelButton")
 
-function AvatarMenuPanelButton:new(x, y, width, height, title, allowMouseUpProcessing, avatarSizeX, avatarSizeY, rows, cols, gap)
+function MenuPanelButton:new(x, y, width, height, title, allowMouseUpProcessing, panelType, avatarSizeX, avatarSizeY, rows, cols, gap, isCentered)
 	local o = {}
 	o = ISButton:new(x, y, width, height, title, nil, nil, nil, allowMouseUpProcessing)
 	setmetatable(o, self)
     self.__index = self
 	o.expanded = false
-	o.attachedPanel = AvatarMenuPanel:new(0,0, avatarSizeX, avatarSizeY, rows, cols, gap)
-	o.attachedPanel.parentBtn = o -- This enables the "attached" behaviours of the panel.
+	o.attachedPanel = panelType:new(0,0, avatarSizeX, avatarSizeY, rows, cols, gap, true)
+	o.attachedPanel.parentBtn = o -- This tells the panel it's part of a button.
+	o.isCentered = isCentered
 	return o
 end
 
-function AvatarMenuPanelButton:initialise()
+function MenuPanelButton:initialise()
 	self.attachedPanel:initialise()
 	self.attachedPanel:setCapture(true)
-	self.attachedPanel:setAlwaysOnTop(true)
+	self.attachedPanel.onWantsClose = function()
+		self:hideMenu()
+	end
 	self:setOnClick(function()
 		if self.expanded then
 			self:hideMenu()
@@ -24,14 +27,19 @@ function AvatarMenuPanelButton:initialise()
 	end)
 end
 
-function AvatarMenuPanelButton:showMenu()
+function MenuPanelButton:showMenu()
 	self.expanded = true
-	self.attachedPanel:setX(self:getAbsoluteX())
-	self.attachedPanel:setY(self:getAbsoluteY() + self:getHeight())
+	if self.isCentered then
+		self.attachedPanel:setX( (getCore():getScreenWidth()/2) - (self.attachedPanel:getWidth()/2) )
+		self.attachedPanel:setY( (getCore():getScreenHeight()/2) - (self.attachedPanel:getHeight()/2) )
+	else
+		self.attachedPanel:setX(self:getAbsoluteX())
+		self.attachedPanel:setY(self:getAbsoluteY() + self:getHeight())
+	end
 	self.attachedPanel:addToUIManager()
 end
 
-function AvatarMenuPanelButton:hideMenu()
+function MenuPanelButton:hideMenu()
 	self.expanded = false
 	self.attachedPanel:removeFromUIManager()
 end

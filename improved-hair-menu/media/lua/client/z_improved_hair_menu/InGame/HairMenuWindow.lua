@@ -27,7 +27,7 @@ function HairMenuPanelWindow:createChildren()
 	local th = self:titleBarHeight()
 	self.resizable = false
 
-	self.hairPanel = HairMenuPanel:new(0,th, 96,96, 2,3, 3, self.isbeard)
+	self.hairPanel = HairMenuPanel:new(0,th, 96,96, 2,3, 3, false)
 	self.hairPanel.showSelectedName = false
 	self.hairPanel:initialise()
 	self.hairPanel:setChar(self.char)
