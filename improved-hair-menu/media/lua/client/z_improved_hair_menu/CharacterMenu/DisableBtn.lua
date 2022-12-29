@@ -112,4 +112,8 @@ function CharacterCreationMain:disableBtn()
 		if self.beardMenuButton then self.beardMenuButton:setVisible(vis) end
 		self.beardMenu:setSelectedInfo(self.beardMenu.info[self.beardTypeCombo.selected])
 	end
+
+	if self.skinColor then
+		self.skinColorButton.attachedPanel:setSelectedInfoIndex(self.skinColor)
+	end
 end

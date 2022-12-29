@@ -140,6 +140,11 @@ function AvatarMenuPanel:onAvatarSelect(avatar)
 end
 
 -- Silently updates the info selection, avoiding triggering the `onSelect` callback which can cause infinite loops.
+function AvatarMenuPanel:setSelectedInfoIndex(index)
+	self:setSelectedInfo(self.info[index])
+end
+
+-- Silently updates the info selection, avoiding triggering the `onSelect` callback which can cause infinite loops.
 function AvatarMenuPanel:setSelectedInfo(info)
 	-- XXX: This function has to allow for nil as beard menus might be initialized to nil if starting with a female character.
 	if self.selectedInfo then self.selectedInfo.selected = false end
