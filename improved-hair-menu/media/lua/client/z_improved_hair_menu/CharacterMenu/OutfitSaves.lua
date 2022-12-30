@@ -74,3 +74,60 @@ function CharacterCreationMain:loadOutfit(box)
 		end
 	end
 end
+
+function CharacterCreationMain:saveBuildStep2(button, joypadData, param2)
+	if joypadData then
+		joypadData.focus = self.presetPanel
+		updateJoypadFocus(joypadData)
+	end
+	
+	if button.internal == "CANCEL" then
+		return
+	end
+	
+	local savename = button.parent.entry:getText()
+	if savename == '' then return end
+	
+	local desc = MainScreen.instance.desc;
+	
+	local builds = CharacterCreationMain.readSavedOutfitFile();
+	local savestring = "gender=" .. MainScreen.instance.charCreationHeader.genderCombo.selected .. ";";
+	savestring = savestring .. "skincolor=" .. self.skinColorButton.backgroundColor.r .. "," .. self.skinColorButton.backgroundColor.g .. "," .. self.skinColorButton.backgroundColor.b .. ";";
+	savestring = savestring .. "name=" .. MainScreen.instance.charCreationHeader.forenameEntry:getText() .. "|" .. MainScreen.instance.charCreationHeader.surnameEntry:getText() .. ";";
+	local hairStyle = self.hairMenu.selectedInfo.id
+	savestring = savestring .. "hair=" .. hairStyle .. "|" .. self.hairColorButton.backgroundColor.r .. "," .. self.hairColorButton.backgroundColor.g .. "," .. self.hairColorButton.backgroundColor.b .. ";";
+	if not desc:isFemale() then
+		savestring = savestring .. "chesthair=" .. (self.chestHairTickBox:isSelected(1) and "1" or "2") .. ";";
+		local beardStyle = self.beardMenu.selectedInfo.id
+		savestring = savestring .. "beard=" .. beardStyle .. ";";
+	end
+	for i,v in pairs(self.clothingCombo) do
+		if v:getOptionData(v.selected) ~= nil then
+			savestring = savestring ..  i .. "=" .. v:getOptionData(v.selected);
+			if self.clothingColorBtn[i] and self.clothingColorBtn[i]:isVisible() then
+				savestring = savestring .. "|" .. self.clothingColorBtn[i].backgroundColor.r .. "," .. self.clothingColorBtn[i].backgroundColor.g  .. "," .. self.clothingColorBtn[i].backgroundColor.b;
+			end
+			if self.clothingTextureCombo[i] and self.clothingTextureCombo[i]:isVisible() then
+				savestring = savestring .. "|" .. self.clothingTextureCombo[i].selected;
+			end
+			savestring = savestring .. ";";
+		end
+	end
+	builds[savename] = savestring;
+	
+	local options = {};
+	CharacterCreationMain.writeSaveFile(builds);
+	for key,val in pairs(builds) do
+		options[key] = 1;
+	end
+	
+	self.savedBuilds.options = {};
+	local i = 1;
+	for key,val in pairs(options) do
+		table.insert(self.savedBuilds.options, key);
+		if key == savename then
+			self.savedBuilds.selected = i;
+		end
+		i = i + 1;
+	end
+end
