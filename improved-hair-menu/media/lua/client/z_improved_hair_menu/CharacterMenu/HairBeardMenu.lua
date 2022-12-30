@@ -2,15 +2,6 @@
 	Replace the original hair combo with our new menu.
 
 	This does overwrite the original code but compared with rearranging the existing elements by hand this just seems easier.
-
-	The only real changes made here are
-	- Remove labels
-	- Hide original combobox
-	- Add hair menu
-	- Reparent hairColorBtn to hair menu
-	- Reparent color picker to hair menu
-	- colorPickerHair mouse capture, this includes the onHairColorMouseDown changes below
-		We do this to stop click through selecting different hairs under the color picker
 ]]
 
 local FONT_HGT_SMALL = getTextManager():getFontHeight(UIFont.Small)
@@ -108,20 +99,9 @@ function CharacterCreationMain:createHairTypeBtn()
 	self.colorPickerHair:initialise()
 	self.colorPickerHair.keepOnScreen = true
 	self.colorPickerHair.pickedTarget = self
-	self.colorPickerHair.resetFocusTo = self.characterPanel
+	self.colorPickerHair.resetFocusTo = self.hairMenu
+	self.colorPickerHair:setCapture(true)
 	self.colorPickerHair:setColors(hairColors1, math.min(#hairColors1, 10), math.ceil(#hairColors1 / 10))
-
-	-- NOTE: We override these picker functions so that we can disable mouse capture
-	local colorPickerHair_picked = self.colorPickerHair.picked
-	function self.colorPickerHair:picked(hide)
-		colorPickerHair_picked(self, hide)
-		self:setCapture(false)
-	end
-	local colorPickerHair_picked2 = self.colorPickerHair.picked2
-	function self.colorPickerHair:picked2(hide)
-		colorPickerHair_picked2(self, hide)
-		self:setCapture(false)
-	end
 
 	-- ----------------------
 	-- -- STUBBLE
@@ -140,10 +120,17 @@ function CharacterCreationMain:createHairTypeBtn()
 	self.hairMenu.stubbleTickBox = self.hairStubbleTickBox
 end
 
-local base_CharacterCreationMain_onHairColorMouseDown = CharacterCreationMain.onHairColorMouseDown
 function CharacterCreationMain:onHairColorMouseDown(button, x, y) 
-	base_CharacterCreationMain_onHairColorMouseDown(self, button, x, y)
-	self.colorPickerHair:setCapture(true)
+	self.colorPickerHair:setX(button:getX())
+	self.colorPickerHair:setY(button:getY() + button:getHeight())
+	self.colorPickerHair:setPickedFunc(CharacterCreationMain.onHairColorPicked)
+	local color = button.backgroundColor
+	self.colorPickerHair:setInitialColor(ColorInfo.new(color.r, color.g, color.b, 1))
+	self.hairMenu:removeChild(self.colorPickerHair)
+	self.hairMenu:addChild(self.colorPickerHair)
+	if self.characterPanel.joyfocus then
+		self.characterPanel.joyfocus.focus = self.colorPickerHair
+	end
 end
 
 --##################
