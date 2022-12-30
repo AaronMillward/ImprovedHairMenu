@@ -35,23 +35,20 @@ function CharacterCreationMain:loadOutfit(box)
 			desc:setSurname(options[2]);
 			MainScreen.instance.charCreationHeader.surnameEntry:setText(options[2]);
 		elseif location[1] == "hair" then
-			local color = luautils.split(options[2], ",");
-			local colorRGB = {};
-			colorRGB.r = tonumber(color[1]);
-			colorRGB.g = tonumber(color[2]);
-			colorRGB.b = tonumber(color[3]);
-			self:onHairColorPicked(colorRGB, true);
-			self.hairTypeCombo.selected = 1;
-			self.hairTypeCombo:selectData(options[1]);
-			self:onHairTypeSelected(self.hairTypeCombo);
+			local color = luautils.split(options[2], ",")
+			local colorRGB = {
+				r = tonumber(color[1]),
+				g = tonumber(color[2]),
+				b = tonumber(color[3]),
+			};
+			self:onHairColorPicked(colorRGB, true)
+			self:onHairTypeSelected(options[1])
 		elseif location[1] == "chesthair" then
 			local chestHair = tonumber(options[1]) == 1
 			self.chestHairTickBox:setSelected(1, chestHair);
 			self:onChestHairSelected(1, chestHair);
 		elseif location[1] == "beard" then
-			self.beardTypeCombo.selected = 1;
-			self.beardTypeCombo:selectData(options and options[1] or "");
-			self:onBeardTypeSelected(self.beardTypeCombo);
+			self:onBeardTypeSelected(options and options[1] or "");
 		elseif self.clothingCombo[location[1]]  then
 --			print("dress on ", location[1], "with", options[1])
 			local bodyLocation = location[1];

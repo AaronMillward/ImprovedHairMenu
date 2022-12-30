@@ -36,13 +36,6 @@ function CharacterCreationMain:createHairTypeBtn()
 	
 	self.yOffset = self.yOffset + FONT_HGT_MEDIUM + 15;
 	
-	self.hairTypeCombo = ISComboBox:new(self.xOffset+90, self.yOffset, self.comboWid, comboHgt, self, CharacterCreationMain.onHairTypeSelected);
-	self.hairTypeCombo:initialise();
-	self.characterPanel:addChild(self.hairTypeCombo)
-	self.hairTypeCombo:setVisible(false);
-	self.hairType = 0
-	-- NOTE: Don't increment the y offset here, the combo is invisible and the menu takes its place
-
 	local menu_size = ImprovedHairMenu.settings:get_menu_size(false)
 	
 	if use_modal then
@@ -62,17 +55,11 @@ function CharacterCreationMain:createHairTypeBtn()
 	end
 
 	self.hairMenu.onSelect = function(info) -- NOTE: Taken from onHairTypeSelected which requires the combobox as a parameter so obviously can't be used here.
-		local desc = MainScreen.instance.desc
-		self.hairType = 1 -- XXX: I don't really know if this is important or not but this seems to work.
-		desc:getHumanVisual():setHairModel(info.id) -- TODO: vanilla also allows this to be nil
-		CharacterCreationHeader.instance.avatarPanel:setSurvivorDesc(desc)
-		self:disableBtn()
+		self:onHairTypeSelected(info.id)
 	end
 	self.hairMenu:setDesc(MainScreen.instance.desc)
 	self:ICSAddPanel(self.hairMenu)
 
-	local xColor = 90;
-	
 	local hairColors = MainScreen.instance.desc:getCommonHairColor();
 	local hairColors1 = {}
 	local info = ColorInfo.new()
@@ -83,13 +70,12 @@ function CharacterCreationMain:createHairTypeBtn()
 		--		info:desaturate(0.5)
 		table.insert(hairColors1, { r=info:getR(), g=info:getG(), b=info:getB() })
 	end
-	local hairColorBtn = ISButton:new(self.hairMenu:getWidth() - 55, FONT_HGT_SMALL/2 , 45, FONT_HGT_SMALL, "", self, CharacterCreationMain.onHairColorMouseDown)
 
+	local hairColorBtn = ISButton:new(self.hairMenu:getWidth() - 55, FONT_HGT_SMALL/2 , 45, FONT_HGT_SMALL, "", self, CharacterCreationMain.onHairColorMouseDown)
 	hairColorBtn:initialise()
 	hairColorBtn:instantiate()
 	local color = hairColors1[1]
 	hairColorBtn.backgroundColor = {r=color.r, g=color.g, b=color.b, a=1}
-	-- self.characterPanel:addChild(hairColorBtn)
 	self.hairMenu:addChild(hairColorBtn)
 	self.hairMenu.hairColorBtn = hairColorBtn
 	self.hairColorButton = hairColorBtn
@@ -106,11 +92,6 @@ function CharacterCreationMain:createHairTypeBtn()
 	-- ----------------------
 	-- -- STUBBLE
 	-- ----------------------
-	self.hairStubbleLbl = ISLabel:new(self.xOffset, self.yOffset + FONT_HGT_SMALL, comboHgt, getText("UI_Stubble"), 1, 1, 1, 1, UIFont.Small);
-	self.hairStubbleLbl:initialise();
-	self.hairStubbleLbl:instantiate();
-	self.characterPanel:addChild(self.hairStubbleLbl);
-	self.yOffset = self.yOffset + FONT_HGT_SMALL
 
 	self.hairStubbleTickBox = ISTickBox:new(self.hairMenu:getWidth() - 55 - FONT_HGT_SMALL - 8, comboHgt/4, FONT_HGT_SMALL-2, FONT_HGT_SMALL-2, "", self, CharacterCreationMain.onShavedHairSelected);
 	self.hairStubbleTickBox:initialise()
@@ -131,6 +112,13 @@ function CharacterCreationMain:onHairColorMouseDown(button, x, y)
 	if self.characterPanel.joyfocus then
 		self.characterPanel.joyfocus.focus = self.colorPickerHair
 	end
+end
+
+function CharacterCreationMain:onHairTypeSelected(name)
+	local desc = MainScreen.instance.desc
+	desc:getHumanVisual():setHairModel(name)
+	CharacterCreationHeader.instance.avatarPanel:setSurvivorDesc(desc)
+	self:disableBtn()
 end
 
 --##################
@@ -163,25 +151,18 @@ function CharacterCreationMain:createBeardTypeBtn()
 	self.beardTypeLbl:setVisible(false);
 	self.characterPanel:addChild(self.beardTypeLbl);
 	
-	self.beardTypeCombo = ISComboBox:new(self.xOffset+90, self.yOffset, self.comboWid, comboHgt, self, CharacterCreationMain.onBeardTypeSelected);
-	self.beardTypeCombo:initialise();
-	--	self.beardTypeCombo:instantiate();
-	self.beardTypeCombo:setVisible(false);
-	self.characterPanel:addChild(self.beardTypeCombo)
-
-
 	-- NOTE: The following is copied from above, it only appears in these two places so I'm not making it a function
 
 	local menu_size = ImprovedHairMenu.settings:get_menu_size(true)
 
 	if use_modal then
-		self.hairMenuButton = MenuPanelButton:new(self.xOffset, self.yOffset, 90, FONT_HGT_SMALL*2, getText("IGUI_Open"), nil, HairMenuPanel, avatar_size, avatar_size, menu_size.cols, menu_size.rows, 3, true)
-		self.hairMenuButton:initialise()
-		self.hairMenuButton:instantiate()
-		self.characterPanel:addChild(self.hairMenuButton)
-		self.yOffset = self.yOffset + self.hairMenuButton:getHeight() + 5;
+		self.beardMenuButton = MenuPanelButton:new(self.xOffset, self.yOffset, 90, FONT_HGT_SMALL*2, getText("IGUI_Open"), nil, HairMenuPanel, avatar_size, avatar_size, menu_size.cols, menu_size.rows, 3, true)
+		self.beardMenuButton:initialise()
+		self.beardMenuButton:instantiate()
+		self.characterPanel:addChild(self.beardMenuButton)
+		self.yOffset = self.yOffset + self.beardMenuButton:getHeight() + 5;
 
-		self.beardMenu = self.hairMenuButton.attachedPanel
+		self.beardMenu = self.beardMenuButton.attachedPanel
 	else
 		self.beardMenu = HairMenuPanel:new(self.xOffset, self.yOffset, avatar_size,avatar_size, menu_size.cols,menu_size.rows, 3, false)
 		self.beardMenu:initialise()
@@ -190,11 +171,8 @@ function CharacterCreationMain:createBeardTypeBtn()
 		self.yOffset = self.yOffset + self.beardMenu:getHeight() + 5;
 	end
 
-	self.beardMenu.onSelect = function(info) -- NOTE: See above `hairMenu`'s `onSelect` for more info
-		local desc = MainScreen.instance.desc
-		desc:getHumanVisual():setBeardModel(info.id)
-		CharacterCreationHeader.instance.avatarPanel:setSurvivorDesc(desc)
-		self:disableBtn()
+	self.beardMenu.onSelect = function(info)
+		self:onBeardTypeSelected(info.id)
 	end
 	self.beardMenu:setDesc(MainScreen.instance.desc)
 	self:ICSAddPanel(self.beardMenu)
@@ -202,11 +180,6 @@ function CharacterCreationMain:createBeardTypeBtn()
 	----------------------
 	-- STUBBLE
 	----------------------
-	self.beardStubbleLbl = ISLabel:new(self.xOffset+70, self.yOffset, comboHgt, getText("UI_Stubble"), 1, 1, 1, 1, UIFont.Small);
-	self.beardStubbleLbl:initialise();
-	self.beardStubbleLbl:instantiate();
-	self.characterPanel:addChild(self.beardStubbleLbl);
-
 	self.beardStubbleTickBox = ISTickBox:new(self.beardMenu:getWidth() - FONT_HGT_SMALL - 10, comboHgt/4, FONT_HGT_SMALL-2, FONT_HGT_SMALL-2, "", self, CharacterCreationMain.onBeardStubbleSelected);
 	self.beardStubbleTickBox:initialise()
 	self.beardStubbleTickBox:addOption("")
@@ -215,4 +188,11 @@ function CharacterCreationMain:createBeardTypeBtn()
 	self.beardMenu.stubbleTickBox = self.beardStubbleTickBox
 
 	self.yOffset = self.yOffset + comboHgt + 10;
+end
+
+function CharacterCreationMain:onBeardTypeSelected(name)
+	local desc = MainScreen.instance.desc
+	desc:getHumanVisual():setBeardModel(name)
+	CharacterCreationHeader.instance.avatarPanel:setSurvivorDesc(desc)
+	self:disableBtn()
 end
