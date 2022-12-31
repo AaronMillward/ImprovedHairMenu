@@ -1,13 +1,12 @@
 HairMenuPanelWindow = ISCollapsableWindowJoypad:derive("HairMenuPanelWindow")
 
-function HairMenuPanelWindow:new(x, y, width, height, playerNum, char, hairlist, isbeard)
+function HairMenuPanelWindow:new(x, y, width, height, playerNum, char, hairlist)
 	local o = ISCollapsableWindowJoypad.new(self, x, y, width, height)
 	setmetatable(o, self)
 	self.__index = self
 	o.char = char
 	o.hairList = hairlist
 	o.onSelect = nil
-	o.isbeard = isbeard
 	o.playerNum = playerNum
 	return o
 end
