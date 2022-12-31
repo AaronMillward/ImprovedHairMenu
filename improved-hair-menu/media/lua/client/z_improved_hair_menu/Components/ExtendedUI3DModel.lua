@@ -9,6 +9,8 @@ ISUI3DModelExt = base:derive("ISUI3DModelExt")
 
 function ISUI3DModelExt:new(x, y, width, height)
 	local o = base.new(self, x, y, width, height)
+	setmetatable(o, self)
+	self.__index = self
 	o.hasDragged = false
 	o.onSelect = nil
 	o.selectable = true

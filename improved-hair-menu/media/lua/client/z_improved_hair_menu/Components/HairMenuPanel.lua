@@ -16,6 +16,8 @@ HairMenuPanel = AvatarMenuPanel:derive("HairMenuPanel")
 
 function HairMenuPanel:new(x, y, size_x, size_y, rows, cols, gap, isModal)
 	local o = AvatarMenuPanel.new(self, x, y, size_x, size_y, rows, cols, gap, isModal)
+	setmetatable(o, self)
+	self.__index = self
 	o.avatarElementType = HairAvatar
 	return o
 end

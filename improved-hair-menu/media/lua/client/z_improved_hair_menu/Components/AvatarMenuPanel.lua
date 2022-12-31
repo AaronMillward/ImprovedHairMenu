@@ -42,6 +42,8 @@ function AvatarMenuPanel:new(x, y, size_x, size_y, rows, cols, gap, isModal)
 	isModal = isModal or false
 
 	local o = base.new(self, x, y, (size_x * cols) + (gap * (cols-1)) , (size_y * rows) + (gap * (rows-1)) + header_height)
+	setmetatable(o, self)
+	self.__index = self
 	o.isAvatarMenu = true -- Used by panels to determine element type.
 	o.gridSizeX = size_x
 	o.gridSizeY = size_y

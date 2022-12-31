@@ -8,6 +8,8 @@ VisualAvatar = ISUI3DModelExt:derive("VisualAvatar")
 
 function VisualAvatar:new(x, y, width, height)
 	local o = ISUI3DModelExt.new(self, x, y, width, height)
+	setmetatable(o, self)
+	self.__index = self
 	o.visualItem = {id = "UNINITIALIZED", display = "UNINITIALIZED", selected = false}
 	o.desc = nil
 	o.char = nil
