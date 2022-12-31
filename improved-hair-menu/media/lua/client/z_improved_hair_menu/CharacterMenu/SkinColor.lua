@@ -34,7 +34,11 @@ function CharacterCreationMain:createChestTypeBtn()
 	}
 	
 	local avatar_size = ImprovedHairMenu.settings:get_avatar_size()
-	self.skinColorButton = MenuPanelButton:new(self.xOffset+xColor, self.yOffset, 45, comboHgt, "", nil, AvatarMenuPanel, avatar_size, avatar_size * 1.5, 1, 5, 3, false)
+	self.skinColorButton = MenuPanelButton:new(
+		self.xOffset+xColor, self.yOffset, 45, comboHgt, "",
+		self, CharacterCreationMain.onSkinColorButtonClick, nil, nil, 
+		AvatarMenuPanel, avatar_size, avatar_size * 1.5, 1, #self.skinColors, 3, false
+	)
 	self.skinColorButton:initialise()
 	self.skinColorButton:instantiate()
 	local color = self.skinColors[1]
@@ -100,6 +104,15 @@ function CharacterCreationMain:createChestTypeBtn()
 	self.chestHairTickBox = tickBox
 
 	self.yOffset = self.yOffset + comboHgt + 10;
+end
+
+function CharacterCreationMain:onSkinColorButtonClick(button)
+	button.attachedPanel:addToUIManager()
+	button.attachedPanel:setX(button:getAbsoluteX())
+	button.attachedPanel:setY(button:getAbsoluteY() + button:getHeight())
+	if self.characterPanel.joyfocus then
+		self.characterPanel.joyfocus.focus = button.attachedPanel
+	end
 end
 
 function CharacterCreationMain:ICSonSkinColorSelected(index)

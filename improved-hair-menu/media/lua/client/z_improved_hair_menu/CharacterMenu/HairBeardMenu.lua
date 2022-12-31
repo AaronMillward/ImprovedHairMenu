@@ -39,7 +39,11 @@ function CharacterCreationMain:createHairTypeBtn()
 	local menu_size = ImprovedHairMenu.settings:get_menu_size(false)
 	
 	if use_modal then
-		self.hairMenuButton = MenuPanelButton:new(self.xOffset, self.yOffset, 90, FONT_HGT_SMALL*2, getText("IGUI_Open"), nil, HairMenuPanel, avatar_size, avatar_size, menu_size.cols, menu_size.rows, 3, true)
+		self.hairMenuButton = MenuPanelButton:new(
+			self.xOffset, self.yOffset, 90, FONT_HGT_SMALL*2, getText("IGUI_Open"),
+			self, CharacterCreationMain.onMenuButtonClick, nil, nil, 
+			HairMenuPanel, avatar_size, avatar_size, menu_size.cols, menu_size.rows, 3
+		)
 		self.hairMenuButton:initialise()
 		self.hairMenuButton:instantiate()
 		self.characterPanel:addChild(self.hairMenuButton)
@@ -57,6 +61,7 @@ function CharacterCreationMain:createHairTypeBtn()
 	self.hairMenu.onSelect = function(info) -- NOTE: Taken from onHairTypeSelected which requires the combobox as a parameter so obviously can't be used here.
 		self:onHairTypeSelected(info.id)
 	end
+	self.hairMenu.resetFocusTo = self.characterPanel
 	self.hairMenu:setDesc(MainScreen.instance.desc)
 	self:ICSAddPanel(self.hairMenu)
 
@@ -80,12 +85,15 @@ function CharacterCreationMain:createHairTypeBtn()
 	self.hairMenu.hairColorBtn = hairColorBtn
 	self.hairColorButton = hairColorBtn
 	
-	-- FIXME: Color picker is below menu
 	self.colorPickerHair = ISColorPicker:new(0, 0, nil)
 	self.colorPickerHair:initialise()
 	self.colorPickerHair.keepOnScreen = true
 	self.colorPickerHair.pickedTarget = self
-	self.colorPickerHair.resetFocusTo = self.hairMenu
+	if use_modal then
+		self.colorPickerHair.resetFocusTo = self.hairMenu
+	else
+		self.colorPickerHair.resetFocusTo = self.characterPanel
+	end
 	self.colorPickerHair:setCapture(true)
 	self.colorPickerHair:setColors(hairColors1, math.min(#hairColors1, 10), math.ceil(#hairColors1 / 10))
 
@@ -101,16 +109,28 @@ function CharacterCreationMain:createHairTypeBtn()
 	self.hairMenu.stubbleTickBox = self.hairStubbleTickBox
 end
 
-function CharacterCreationMain:onHairColorMouseDown(button, x, y) 
-	self.colorPickerHair:setX(button:getX())
-	self.colorPickerHair:setY(button:getY() + button:getHeight())
+function CharacterCreationMain:onMenuButtonClick(button)
+	button.attachedPanel:addToUIManager()
+	button.attachedPanel:setX( (getCore():getScreenWidth()/2) - (button.attachedPanel:getWidth()/2) )
+	button.attachedPanel:setY( (getCore():getScreenHeight()/2) - (button.attachedPanel:getHeight()/2) )
+	if self.characterPanel.joyfocus then
+		self.characterPanel.joyfocus.focus = button.attachedPanel
+	end
+end
+
+function CharacterCreationMain:onHairColorMouseDown(button, x, y)
 	self.colorPickerHair:setPickedFunc(CharacterCreationMain.onHairColorPicked)
 	local color = button.backgroundColor
 	self.colorPickerHair:setInitialColor(ColorInfo.new(color.r, color.g, color.b, 1))
-	self.hairMenu:removeChild(self.colorPickerHair)
-	self.hairMenu:addChild(self.colorPickerHair)
+	self.colorPickerHair:addToUIManager()
+	self.colorPickerHair:setX(button:getAbsoluteX())
+	self.colorPickerHair:setY(button:getAbsoluteY() + button:getHeight())
+
 	if self.characterPanel.joyfocus then
 		self.characterPanel.joyfocus.focus = self.colorPickerHair
+	end
+	if self.hairMenu.joyfocus then
+		self.hairMenu.joyfocus.focus = self.colorPickerHair
 	end
 end
 
@@ -156,7 +176,11 @@ function CharacterCreationMain:createBeardTypeBtn()
 	local menu_size = ImprovedHairMenu.settings:get_menu_size(true)
 
 	if use_modal then
-		self.beardMenuButton = MenuPanelButton:new(self.xOffset, self.yOffset, 90, FONT_HGT_SMALL*2, getText("IGUI_Open"), nil, HairMenuPanel, avatar_size, avatar_size, menu_size.cols, menu_size.rows, 3, true)
+		self.beardMenuButton = MenuPanelButton:new(
+			self.xOffset, self.yOffset, 90, FONT_HGT_SMALL*2, getText("IGUI_Open"),
+			self, CharacterCreationMain.onMenuButtonClick, nil, nil,
+			HairMenuPanel, avatar_size, avatar_size, menu_size.cols, menu_size.rows, 3
+		)
 		self.beardMenuButton:initialise()
 		self.beardMenuButton:instantiate()
 		self.characterPanel:addChild(self.beardMenuButton)
@@ -174,6 +198,7 @@ function CharacterCreationMain:createBeardTypeBtn()
 	self.beardMenu.onSelect = function(info)
 		self:onBeardTypeSelected(info.id)
 	end
+	self.beardMenu.resetFocusTo = self.characterPanel
 	self.beardMenu:setDesc(MainScreen.instance.desc)
 	self:ICSAddPanel(self.beardMenu)
 

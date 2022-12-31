@@ -71,24 +71,8 @@ end
 
 local original_onJoypadDown = CharacterCreationMainCharacterPanel.onJoypadDown
 function CharacterCreationMainCharacterPanel:onJoypadDown(button, joypadData)
-	local children = self:getVisibleChildren(self.joypadIndexY)
-	local child = children[self.joypadIndex]
+	local child = self:getVisibleChildren(self.joypadIndexY)[self.joypadIndex]
 	if child and child.isAvatarMenu then
-		if child.expanded == false then
-			if button == Joypad.AButton then
-				child:forceClick()
-			else
-				original_onJoypadDown(self, button, joypadData)
-			end
-		else
-			if button == Joypad.BButton then
-				child.attachedMenu:close()
-			else
-				child.attachedMenu:onJoypadDown(button, joypadData)
-			end
-		end
-	elseif child and child.isAvatarMenu then
-		if button == Joypad.BButton then original_onJoypadDown(self, button, joypadData) return end
 		child:onJoypadDown(button, joypadData)
 	else
 		original_onJoypadDown(self, button, joypadData)
@@ -100,13 +84,7 @@ function CharacterCreationMainCharacterPanel:onJoypadDirLeft(joypadData)
 	local children = self:getVisibleChildren(self.joypadIndexY)
 	local child = children[self.joypadIndex]
 	
-	if child and child.isAvatarMenuButton then
-		if child.expanded == false then
-			original_onJoypadDirLeft(self, joypadData)
-		else
-			child.attachedMenu:onJoypadDirLeft(joypadData)
-		end
-	elseif child and child.isAvatarMenu then
+	if child and child.isAvatarMenu then
 		child:onJoypadDirLeft(joypadData)
 	else
 		original_onJoypadDirLeft(self, joypadData)
@@ -115,15 +93,8 @@ end
 
 local original_onJoypadDirRight = CharacterCreationMainCharacterPanel.onJoypadDirRight
 function CharacterCreationMainCharacterPanel:onJoypadDirRight(joypadData)
-	local children = self:getVisibleChildren(self.joypadIndexY)
-	local child = children[self.joypadIndex]
-	if child and child.isAvatarMenuButton then
-		if child.expanded == false then
-			original_onJoypadDirRight(self, joypadData)
-		else
-			child.attachedMenu:onJoypadDirRight(joypadData)
-		end
-	elseif child and child.isAvatarMenu then
+	local child = self:getVisibleChildren(self.joypadIndexY)[self.joypadIndex]
+	if child and child.isAvatarMenu then
 		child:onJoypadDirRight(joypadData)
 	else
 		original_onJoypadDirRight(self, joypadData)
@@ -133,39 +104,23 @@ end
 local old_onJoypadDirUp = CharacterCreationMainCharacterPanel.onJoypadDirUp
 function CharacterCreationMainCharacterPanel:onJoypadDirUp(joypadData)
 	local child = self:getVisibleChildren(self.joypadIndexY)[self.joypadIndex]
-	if child and child.isAvatarMenuButton then
-		if child.expanded == true then
-			child.attachedMenu:onJoypadDirUp(joypadData)
-		else
-			old_onJoypadDirUp(self, joypadData)
-		end
-	elseif child and child.isAvatarMenu then
-		if child:isNextUpOutside() then
-			old_onJoypadDirUp(self, joypadData)
-		else
+	if child and child.isAvatarMenu then
+		if not child:isNextUpOutside() then
 			child:onJoypadDirUp(joypadData)
+			return
 		end
-	else
-		old_onJoypadDirUp(self, joypadData)
 	end
+	old_onJoypadDirUp(self, joypadData)
 end
 
 local old_onJoypadDirDown = CharacterCreationMainCharacterPanel.onJoypadDirDown
 function CharacterCreationMainCharacterPanel:onJoypadDirDown(joypadData)
 	local child = self:getVisibleChildren(self.joypadIndexY)[self.joypadIndex]
-	if child and child.isAvatarMenuButton then
-		if child.expanded == true then
-			child.attachedMenu:onJoypadDirDown(joypadData)
-		else
-			old_onJoypadDirDown(self, joypadData)
-		end
-	elseif child and child.isAvatarMenu then
-		if child:isNextDownOutside() then
-			old_onJoypadDirDown(self, joypadData)
-		else
+	if child and child.isAvatarMenu then
+		if not child:isNextDownOutside() then
 			child:onJoypadDirDown(joypadData)
+			return
 		end
-	else
-		old_onJoypadDirDown(self, joypadData)
 	end
+	old_onJoypadDirDown(self, joypadData)
 end

@@ -26,6 +26,11 @@ function AvatarMenuPanel:render()
 	if self.showSelectedName then
 		self:drawText(self.selectedInfo.display or "error string", x_off, height/2, 0.9, 0.9, 0.9, 0.9, UIFont.Small)
 	end
+
+	if self.joyfocus then
+		self:drawRectBorder(0, -self:getYScroll(), self:getWidth(), self:getHeight(), 0.4, 0.2, 1.0, 1.0);
+		self:drawRectBorder(1, 1-self:getYScroll(), self:getWidth()-2, self:getHeight()-2, 0.4, 0.2, 1.0, 1.0);
+	end
 end
 
 function AvatarMenuPanel:new(x, y, size_x, size_y, rows, cols, gap, isModal)
@@ -49,7 +54,7 @@ function AvatarMenuPanel:new(x, y, size_x, size_y, rows, cols, gap, isModal)
 	o.info = {} -- HairInfo stored here
 	o.pageCurrent = 1
 	o.onSelect = nil -- Callback
-	o.onWantsClose = nil -- Callback
+	o.onClose = nil -- Callback
 	o.showSelectedName = true
 	o.joypadCursor = 1
 	o.selectedInfo = {id = "", display = ""}
@@ -204,10 +209,19 @@ function AvatarMenuPanel:onMouseUp(x, y)
 	end
 
 	if self.isModal and not self:isMouseOver() then -- due to setCapture()
-		if self.onWantsClose then self.onWantsClose() end
+		self:close()
 	end
 end
 
+function AvatarMenuPanel:close()
+	if self.joyfocus then
+		self.joyfocus.focus = self.resetFocusTo
+	end
+	if not self.parent then
+		self:removeFromUIManager()
+	end
+	if self.onClose then self.onClose() end
+end
 
 -- #########
 -- # Pages #
@@ -230,7 +244,10 @@ function AvatarMenuPanel:getCurrentPageSize()
 	if self:getNumberOfPages() ~= self.pageCurrent then
 		return self.pageSize
 	else
-		return #self.info % self.pageSize
+		local s = #self.info % self.pageSize
+		-- XXX: It can't actually be 0 or the page wouldn't exist. the page is just full.
+		if s == 0 then s = self.pageSize end
+		return s
 	end
 end
 
@@ -374,6 +391,9 @@ function AvatarMenuPanel:onJoypadDown(button, joypadData)
 	if button == Joypad.AButton then
 		self:ensureCursor()
 		if self.avatarList[self.joypadCursor] then self.avatarList[self.joypadCursor]:select() end
+	end
+	if button == Joypad.BButton then
+		self:close()
 	end
 end
 
