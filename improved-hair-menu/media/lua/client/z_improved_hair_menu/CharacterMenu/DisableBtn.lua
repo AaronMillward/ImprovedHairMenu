@@ -7,6 +7,40 @@
 	the vanilla elements around and functional which is hard to maintain when the game updates.
 ]]
 
+--TODO: These are out of sync in the menu
+
+function clothingapplyToDesc(visualItem, desc)
+	local wornItems = desc:getWornItems()
+
+	local function getByLocation(wornItems, bodyLocation)
+		for i=0,wornItems:size()-1 do
+			local wornItem = wornItems:get(i)
+			if wornItem:getLocation() == bodyLocation then
+				return wornItem
+			end
+		end
+	end
+
+	local wornItem = getByLocation(wornItems, visualItem.bodyLocation)
+
+	if wornItem then
+		visualItem.original = wornItem:getItem()
+		wornItems:remove(wornItem:getItem())
+	end
+
+	if visualItem.id then
+		wornItems:setItem(visualItem.bodyLocation, InventoryItemFactory.CreateItem(visualItem.id))
+	end
+end
+
+function clothingrestoreDesc(visualItem, desc)
+	local wornItems = desc:getWornItems()
+	wornItems:remove(wornItems:getItem(visualItem.bodyLocation))
+	if visualItem.original then
+		wornItems:setItem(visualItem.original:getBodyLocation(), visualItem.original)
+	end
+end
+
 function CharacterCreationMain:disableBtn()
 	-- CharacterCreationHeader calls this during creation
 	if not self.chestHairLbl then return end -- If the menu hasn't been created yet
@@ -44,26 +78,44 @@ function CharacterCreationMain:disableBtn()
 			end
 		end
 		
-		local fillCombo = function(bodyLocation)
-			local combo = self.clothingCombo[bodyLocation]
-			combo.options = {}
-			combo:addOptionWithData(getText("UI_characreation_clothing_none"), nil)
+		local fillMenu = function(bodyLocation)
+			local menu = self.clothingMenu[bodyLocation]
 			local items = getAllItemsForBodyLocation(bodyLocation)
 			table.sort(items, function(a,b)
 				local itemA = ScriptManager.instance:FindItem(a)
 				local itemB = ScriptManager.instance:FindItem(b)
 				return not string.sort(itemA:getDisplayName(), itemB:getDisplayName())
 			end)
+			
+			local info = {
+				{
+					id = nil,
+					display = getText("UI_characreation_clothing_none"),
+					applyToDesc = clothingapplyToDesc,
+					restoreDesc = clothingrestoreDesc,
+					bodyLocation = bodyLocation,
+				},
+			}
 			for _,fullType in ipairs(items) do
 				local item = ScriptManager.instance:FindItem(fullType)
 				local displayName = item:getDisplayName()
-				combo:addOptionWithData(displayName, fullType)
+				table.insert(info,
+					{
+						id = fullType,
+						display = displayName,
+						applyToDesc = clothingapplyToDesc,
+						restoreDesc = clothingrestoreDesc,
+						bodyLocation = bodyLocation,
+					}
+				)
 			end
+			menu.attachedPanel:setInfoTable(info)
 		end
 		
 		if CharacterCreationMain.debug then
-			for bodyLocation,combo in pairs(self.clothingCombo) do
-				fillCombo(bodyLocation)
+			for bodyLocation,menu in pairs(self.clothingMenu) do
+				fillMenu(bodyLocation)
+				menu.attachedPanel:showPage(1)
 			end
 		end
 	end
@@ -105,61 +157,61 @@ function CharacterCreationMain:disableBtn()
 			end
 		end
 		
-		if CharacterCreationMain.debug then
-			for bodyLocation,combo in pairs(self.clothingCombo) do
-				local selected = combo.selected
-				combo.selected = 1 -- None
-				local item = desc:getWornItem(bodyLocation)
-				local clothingItem = nil
-				if item and item:getVisual() then
-					combo.selected = combo:find(function(text, data, fullType)
-						return data == fullType
-					end, item:getFullType())
-					clothingItem = item:getVisual():getClothingItem()
-				end
-				local textureChoices = clothingItem and (clothingItem:hasModel() and clothingItem:getTextureChoices() or clothingItem:getBaseTextures())
-				if textureChoices and (textureChoices:size() > 1) then
-					local textureChoice = clothingItem:hasModel() and item:getVisual():getTextureChoice() or item:getVisual():getBaseTexture()
-					local combo = self.clothingTextureCombo[bodyLocation];
-					combo:setVisible(true);
-					combo.options = {}
-					for i=0,textureChoices:size() - 1 do
-						combo:addOptionWithData("Type " .. (i + 1), textureChoices:get(i))
-						if i == textureChoice then
-							combo:select("Type " .. (i + 1));
-						end
-					end
-				else
-					self.clothingTextureCombo[bodyLocation].options = {};
-					self.clothingTextureCombo[bodyLocation]:setVisible(false);
-				end
-				if clothingItem and clothingItem:getAllowRandomTint() then
-					local color = item:getVisual():getTint(clothingItem)
-					self.clothingColorBtn[bodyLocation].backgroundColor = { r=color:getRedFloat(), g=color:getGreenFloat(), b=color:getBlueFloat(), a = 1 }
-					self.clothingColorBtn[bodyLocation]:setVisible(true)
-				else
-					self.clothingColorBtn[bodyLocation].backgroundColor = { r=1, g=1, b=1, a = 1 }
-					self.clothingColorBtn[bodyLocation]:setVisible(false)
-				end
-				if clothingItem and clothingItem:getDecalGroup() then
-					-- Fill the decal combo if a different clothing item is now selected.
-					if self.decalItem ~= item then
-						self.decalItem = item
-						local decalCombo = self.clothingDecalCombo[bodyLocation]
-						decalCombo.options = {}
-						local items = getAllDecalNamesForItem(item)
-						for i=1,items:size() do
-							decalCombo:addOptionWithData(items:get(i-1), items:get(i-1))
-						end
-					end
-					local decalName = item:getVisual():getDecal(clothingItem)
-					self.clothingDecalCombo[bodyLocation]:select(decalName)
-					self.clothingDecalCombo[bodyLocation]:setVisible(true)
-				else
-					self.clothingDecalCombo[bodyLocation]:setVisible(false)
-				end
-			end
-		end
+		-- if CharacterCreationMain.debug then
+		-- 	for bodyLocation,combo in pairs(self.clothingCombo) do
+		-- 		local selected = combo.selected
+		-- 		combo.selected = 1 -- None
+		-- 		local item = desc:getWornItem(bodyLocation)
+		-- 		local clothingItem = nil
+		-- 		if item and item:getVisual() then
+		-- 			combo.selected = combo:find(function(text, data, fullType)
+		-- 				return data == fullType
+		-- 			end, item:getFullType())
+		-- 			clothingItem = item:getVisual():getClothingItem()
+		-- 		end
+		-- 		local textureChoices = clothingItem and (clothingItem:hasModel() and clothingItem:getTextureChoices() or clothingItem:getBaseTextures())
+		-- 		if textureChoices and (textureChoices:size() > 1) then
+		-- 			local textureChoice = clothingItem:hasModel() and item:getVisual():getTextureChoice() or item:getVisual():getBaseTexture()
+		-- 			local combo = self.clothingTextureCombo[bodyLocation];
+		-- 			combo:setVisible(true);
+		-- 			combo.options = {}
+		-- 			for i=0,textureChoices:size() - 1 do
+		-- 				combo:addOptionWithData("Type " .. (i + 1), textureChoices:get(i))
+		-- 				if i == textureChoice then
+		-- 					combo:select("Type " .. (i + 1));
+		-- 				end
+		-- 			end
+		-- 		else
+		-- 			self.clothingTextureCombo[bodyLocation].options = {};
+		-- 			self.clothingTextureCombo[bodyLocation]:setVisible(false);
+		-- 		end
+		-- 		if clothingItem and clothingItem:getAllowRandomTint() then
+		-- 			local color = item:getVisual():getTint(clothingItem)
+		-- 			self.clothingColorBtn[bodyLocation].backgroundColor = { r=color:getRedFloat(), g=color:getGreenFloat(), b=color:getBlueFloat(), a = 1 }
+		-- 			self.clothingColorBtn[bodyLocation]:setVisible(true)
+		-- 		else
+		-- 			self.clothingColorBtn[bodyLocation].backgroundColor = { r=1, g=1, b=1, a = 1 }
+		-- 			self.clothingColorBtn[bodyLocation]:setVisible(false)
+		-- 		end
+		-- 		if clothingItem and clothingItem:getDecalGroup() then
+		-- 			-- Fill the decal combo if a different clothing item is now selected.
+		-- 			if self.decalItem ~= item then
+		-- 				self.decalItem = item
+		-- 				local decalCombo = self.clothingDecalCombo[bodyLocation]
+		-- 				decalCombo.options = {}
+		-- 				local items = getAllDecalNamesForItem(item)
+		-- 				for i=1,items:size() do
+		-- 					decalCombo:addOptionWithData(items:get(i-1), items:get(i-1))
+		-- 				end
+		-- 			end
+		-- 			local decalName = item:getVisual():getDecal(clothingItem)
+		-- 			self.clothingDecalCombo[bodyLocation]:select(decalName)
+		-- 			self.clothingDecalCombo[bodyLocation]:setVisible(true)
+		-- 		else
+		-- 			self.clothingDecalCombo[bodyLocation]:setVisible(false)
+		-- 		end
+		-- 	end
+		-- end
 	end
 end
 
