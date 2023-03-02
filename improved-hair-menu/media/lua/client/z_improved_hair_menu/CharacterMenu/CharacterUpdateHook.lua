@@ -23,3 +23,13 @@ function CharacterCreationMain:ICSAddPanel(panel)
 	self.ICSVisuals = self.ICSVisuals or {}
 	table.insert(self.ICSVisuals, panel)
 end
+
+function CharacterCreationMain:ICSRemovePanel(panel)
+	self.ICSVisuals = self.ICSVisuals or {}
+	for i,storedPanel in ipairs(self.ICSVisuals) do
+		if panel == storedPanel then
+			table.remove(self.ICSVisuals, i)
+			break
+		end
+	end
+end

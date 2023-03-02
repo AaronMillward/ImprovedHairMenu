@@ -7,37 +7,26 @@
 	the vanilla elements around and functional which is hard to maintain when the game updates.
 ]]
 
---TODO: These are out of sync in the menu
-
 function clothingapplyToDesc(visualItem, desc)
 	local wornItems = desc:getWornItems()
 
-	local function getByLocation(wornItems, bodyLocation)
-		for i=0,wornItems:size()-1 do
-			local wornItem = wornItems:get(i)
-			if wornItem:getLocation() == bodyLocation then
-				return wornItem
-			end
-		end
+	visualItem.original = {}
+	for i=0, wornItems:size()-1 do
+		table.insert(visualItem.original, wornItems:get(i))
 	end
-
-	local wornItem = getByLocation(wornItems, visualItem.bodyLocation)
-
-	if wornItem then
-		visualItem.original = wornItem:getItem()
-		wornItems:remove(wornItem:getItem())
-	end
-
+	
 	if visualItem.id then
 		wornItems:setItem(visualItem.bodyLocation, InventoryItemFactory.CreateItem(visualItem.id))
+	else
+		wornItems:setItem(visualItem.bodyLocation, nil)
 	end
 end
 
 function clothingrestoreDesc(visualItem, desc)
 	local wornItems = desc:getWornItems()
-	wornItems:remove(wornItems:getItem(visualItem.bodyLocation))
-	if visualItem.original then
-		wornItems:setItem(visualItem.original:getBodyLocation(), visualItem.original)
+	wornItems:clear()
+	for _,wornItem in ipairs(visualItem.original) do
+		wornItems:setItem(wornItem:getLocation(), wornItem:getItem())
 	end
 end
 
@@ -113,7 +102,7 @@ function CharacterCreationMain:disableBtn()
 		end
 		
 		if CharacterCreationMain.debug then
-			for bodyLocation,menu in pairs(self.clothingMenu) do
+			for bodyLocation,menu in ipairs(self.clothingMenu) do
 				fillMenu(bodyLocation)
 				menu.attachedPanel:showPage(1)
 			end

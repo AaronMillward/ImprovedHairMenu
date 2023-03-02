@@ -99,6 +99,7 @@ function CharacterCreationMain:doClothingCombo(definition, erasePrevious)
 				self.clothingPanel:removeChild(self.clothingColorBtn[v.bodyLocation]);
 				self.clothingPanel:removeChild(self.clothingTextureCombo[v.bodyLocation]);
 				self.clothingPanel:removeChild(self.clothingComboLabel[v.bodyLocation]);
+				self:ICSRemovePanel(v.attachedPanel)
 				self.clothingPanel:removeChild(v);
 			end
 		end
@@ -145,9 +146,9 @@ function CharacterCreationMain:doClothingCombo(definition, erasePrevious)
 			-- some clothing are president in default list AND profession list, so we can force a specific clothing in profession we already have
 			local isDuplicate = false
 			for _, info in ipairs(menuButton.attachedPanel.info) do
-				if info.displayName == displayName then isDuplicate = true end
+				if info.display == displayName then isDuplicate = true end
 			end
-			if not isDuplicate then
+			if isDuplicate == false then
 				table.insert(menuButton.attachedPanel.info, {
 					id = clothing,
 					display = displayName,
@@ -174,9 +175,26 @@ function CharacterCreationMain:doClothingCombo(definition, erasePrevious)
 	self.colorPicker.resetFocusTo = self.clothingPanel
 end
 
--- local original_initClothing = CharacterCreationMain.initClothing
--- function CharacterCreationMain:initClothing()
--- 	CharacterCreationMain.forceUpdateCombo = true;
--- 	original_initClothing(self)
--- 	self:disableBtn();
--- end
+function CharacterCreationMain:updateSelectedClothingCombo()
+	if CharacterCreationMain.debug then return; end
+	local desc = MainScreen.instance.desc;
+	if self.clothingMenu then
+		for i,menu in pairs(self.clothingMenu) do
+			menu.attachedPanel:setSelectedInfoIndex(1)
+			self.clothingColorBtn[menu.bodyLocation]:setVisible(false);
+			self.clothingTextureCombo[menu.bodyLocation]:setVisible(false);
+			-- we select the current clothing we have at this location in the combo
+			local currentItem = desc:getWornItem(menu.bodyLocation);
+			if currentItem then
+				for j,v in ipairs(menu.attachedPanel.info) do
+					if v.display == currentItem:getDisplayName() then
+						menu.attachedPanel:setSelectedInfoIndex(j)
+						break
+					end
+				end
+				self:updateColorButton(menu.bodyLocation, currentItem);
+				self:updateClothingTextureCombo(menu.bodyLocation, currentItem);
+			end
+		end
+	end
+end
