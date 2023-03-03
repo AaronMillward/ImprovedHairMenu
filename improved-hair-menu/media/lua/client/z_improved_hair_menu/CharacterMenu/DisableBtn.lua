@@ -126,23 +126,23 @@ function CharacterCreationMain:disableBtn()
 		
 	if MainScreen.instance.avatar then
 		local hairModel = desc:getHumanVisual():getHairModel()
-		for i=1,#self.hairMenu.info do
-			local name = self.hairMenu.info[i].id
-			if name:lower() == hairModel:lower() then
-				-- NOTE: hairMenu's onSelect triggers disableBtn so we need to set the selection silently to avoid an infinite loop
-				self.hairMenu:setSelectedInfoIndex(i)
-				break
-			end
+		
+		local j = self.hairMenu:findInfoIndex(function (info)
+			return info.id:lower() == hairModel:lower()
+		end)
+		-- NOTE: hairMenu's onSelect triggers disableBtn so we need to set the selection silently to avoid an infinite loop
+		if j then
+			self.hairMenu:setSelectedInfoIndex(j)
 		end
 		
 		if not desc:isFemale() then
 			local beardModel = desc:getHumanVisual():getBeardModel()
-			for i=1,#self.beardMenu.info do
-				local name = self.beardMenu.info[i].id
-				if name:lower() == beardModel:lower() then
-					self.beardMenu:setSelectedInfoIndex(i)
-					break
-				end
+
+			local j = self.beardMenu:findInfoIndex(function (info)
+				return info.id:lower() == beardModel:lower()
+			end)
+			if j then
+				self.beardMenu:setSelectedInfoIndex(j)
 			end
 		end
 		

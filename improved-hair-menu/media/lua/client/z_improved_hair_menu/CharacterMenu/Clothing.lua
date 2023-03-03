@@ -132,10 +132,10 @@ function CharacterCreationMain:doClothingCombo(definition, erasePrevious)
 			local item = ScriptManager.instance:FindItem(clothing)
 			local displayName = item:getDisplayName()
 			-- some clothing are president in default list AND profession list, so we can force a specific clothing in profession we already have
-			local isDuplicate = false
-			for _, info in ipairs(menuButton.attachedPanel.info) do
-				if info.display == displayName then isDuplicate = true end
-			end
+			local isDuplicate = menuButton.attachedPanel:findInfoIndex(function (info)
+				return info.display == displayName
+			end) ~= nil
+			
 			if isDuplicate == false then
 				table.insert(menuButton.attachedPanel.info, {
 					id = clothing,
@@ -174,12 +174,13 @@ function CharacterCreationMain:updateSelectedClothingCombo()
 			-- we select the current clothing we have at this location in the combo
 			local currentItem = desc:getWornItem(menu.bodyLocation);
 			if currentItem then
-				for j,v in ipairs(menu.attachedPanel.info) do
-					if v.display == currentItem:getDisplayName() then
-						menu.attachedPanel:setSelectedInfoIndex(j)
-						break
-					end
+				local j = menu.attachedPanel:findInfoIndex(function (info)
+					return info.display == currentItem:getDisplayName()
+				end)
+				if j then
+					menu.attachedPanel:setSelectedInfoIndex(j)
 				end
+
 				self:updateColorButton(menu.bodyLocation, currentItem);
 				self:updateClothingTextureCombo(menu.bodyLocation, currentItem);
 			end
