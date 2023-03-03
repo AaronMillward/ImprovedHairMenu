@@ -56,31 +56,31 @@ function CharacterCreationMain:createChestTypeBtn()
 	self.skinColorButton.attachedPanel:setInfoTable({
 		{
 			id = 0,
-			display = "Lightest",
+			display = getText("IGUI_IHM_lightest_skin_color"),
 			getterName = "getSkinTextureIndex",
 			setterName = "setSkinTextureIndex",
 		},
 		{
 			id = 1,
-			display = "Light",
+			display = getText("IGUI_IHM_light_skin_color"),
 			getterName = "getSkinTextureIndex",
 			setterName = "setSkinTextureIndex",
 		},
 		{
 			id = 2,
-			display = "Medium",
+			display = getText("IGUI_IHM_medium_skin_color"),
 			getterName = "getSkinTextureIndex",
 			setterName = "setSkinTextureIndex",
 		},
 		{
 			id = 3,
-			display = "Dark",
+			display = getText("IGUI_IHM_dark_skin_color"),
 			getterName = "getSkinTextureIndex",
 			setterName = "setSkinTextureIndex",
 		},
 		{
 			id = 4,
-			display = "Darkest",
+			display = getText("IGUI_IHM_darkest_skin_color"),
 			getterName = "getSkinTextureIndex",
 			setterName = "setSkinTextureIndex",
 		},

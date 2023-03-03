@@ -9,4 +9,9 @@ IGUI_EN = {
 	IGUI_IHM_beard_cols = "Inline Beard Menu Columns"
 	IGUI_IHM_modal_rows = "Modal Dialog Rows"
 	IGUI_IHM_modal_cols = "Modal Dialog Columns"
+	IGUI_IHM_lightest_skin_color = "Lightest"
+	IGUI_IHM_light_skin_color = "Light"
+	IGUI_IHM_medium_skin_color = "Medium"
+	IGUI_IHM_dark_skin_color = "Dark"
+	IGUI_IHM_darkest_skin_color = "Darkest"
 }
