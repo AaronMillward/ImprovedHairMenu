@@ -161,6 +161,8 @@ function CharacterCreationMain:disableBtn()
 					menu:setSelectedInfoIndex(i)
 					clothingItem = item:getVisual():getClothingItem()
 				end
+				menuButton:setTitle(menu.selectedInfo.display)
+				
 				local textureChoices = clothingItem and (clothingItem:hasModel() and clothingItem:getTextureChoices() or clothingItem:getBaseTextures())
 				if textureChoices and (textureChoices:size() > 1) then
 					local textureChoice = clothingItem:hasModel() and item:getVisual():getTextureChoice() or item:getVisual():getBaseTexture()
