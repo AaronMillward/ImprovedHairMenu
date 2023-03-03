@@ -41,7 +41,7 @@ local function createClothingComboUnified(self, bodyLocation, debug)
 
 	local comboDecal = nil
 	if debug == true then
-		local comboDecal = ISComboBox:new(button:getRight() + 20, self.yOffset, self.comboWid, comboHgt, self, self.onClothingDecalComboSelected, bodyLocation)
+		comboDecal = ISComboBox:new(button:getRight() + 20, self.yOffset, self.comboWid, comboHgt, self, self.onClothingDecalComboSelected, bodyLocation)
 		comboDecal:initialise()
 		self.clothingPanel:addChild(comboDecal)
 	end 
