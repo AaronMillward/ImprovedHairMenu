@@ -15,14 +15,14 @@ local function createClothingComboUnified(self, bodyLocation, debug)
 	local avatar_size = ImprovedHairMenu.settings:get_avatar_size()
 	local menuButton = MenuPanelButton:new(
 		90 + 70, self.yOffset, self.comboWid, comboHgt, getText("UI_ClothingType_" .. bodyLocation),
-		self, CharacterCreationMain.onSkinColorButtonClick, nil, nil,
+		self, CharacterCreationMain.onClothingMenuButtonClick, nil, nil,
 		AvatarMenuPanel, avatar_size, avatar_size * 1.5, 1, 5, 3
 	)
 	menuButton:initialise()
 	menuButton:instantiate()
 	self.clothingPanel:addChild(menuButton)
 	
-	menuButton.attachedPanel.resetFocusTo = self.characterPanel
+	menuButton.attachedPanel.resetFocusTo = self.clothingPanel
 	menuButton.attachedPanel:setDesc(MainScreen.instance.desc)
 	self:ICSAddPanel(menuButton.attachedPanel)
 	menuButton.bodyLocation = bodyLocation
@@ -203,4 +203,13 @@ function CharacterCreationMain:onClothingComboSelected(bodyLocation, itemType)
 	
 	CharacterCreationHeader.instance.avatarPanel:setSurvivorDesc(desc)
 	self:disableBtn()
+end
+
+function CharacterCreationMain:onClothingMenuButtonClick(button)
+	button.attachedPanel:addToUIManager()
+	button.attachedPanel:setX(button:getAbsoluteX())
+	button.attachedPanel:setY(button:getAbsoluteY() + button:getHeight())
+	if self.clothingPanel.joyfocus then
+		self.clothingPanel.joyfocus.focus = button.attachedPanel
+	end
 end
