@@ -184,6 +184,8 @@ function CharacterCreationMain:updateSelectedClothingCombo()
 				self:updateColorButton(menu.bodyLocation, currentItem);
 				self:updateClothingTextureCombo(menu.bodyLocation, currentItem);
 			end
+
+			menu:setTitle(menu.attachedPanel.selectedInfo.display)
 		end
 	end
 end
