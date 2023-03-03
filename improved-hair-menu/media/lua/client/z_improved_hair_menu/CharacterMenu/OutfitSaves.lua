@@ -49,13 +49,19 @@ function CharacterCreationMain:loadOutfit(box)
 			self:onChestHairSelected(1, chestHair);
 		elseif location[1] == "beard" then
 			self:onBeardTypeSelected(options and options[1] or "");
-		elseif self.clothingCombo[location[1]]  then
+		elseif self.clothingMenu[location[1]] then -- Modified
 --			print("dress on ", location[1], "with", options[1])
 			local bodyLocation = location[1];
 			local itemType = options[1];
-			self.clothingCombo[bodyLocation].selected = 1;
-			self.clothingCombo[bodyLocation]:selectData(itemType);
-			self:onClothingComboSelected(self.clothingCombo[bodyLocation], bodyLocation);
+
+			local menuButton = self.clothingMenu[bodyLocation]
+			local i = menuButton.attachedPanel:findInfoIndex(function (info) return info.id == itemType end)
+			if i then
+				self.clothingMenu[bodyLocation].attachedPanel:setSelectedInfoIndex(i)
+			end
+
+			self:onClothingComboSelected(bodyLocation, itemType)
+			
 			if options[2] then
 				local comboTexture = self.clothingTextureCombo[bodyLocation]
 				local color = luautils.split(options[2], ",");
@@ -101,9 +107,9 @@ function CharacterCreationMain:saveBuildStep2(button, joypadData, param2)
 		local beardStyle = self.beardMenu.selectedInfo.id
 		savestring = savestring .. "beard=" .. beardStyle .. ";";
 	end
-	for i,v in pairs(self.clothingCombo) do
-		if v:getOptionData(v.selected) ~= nil then
-			savestring = savestring ..  i .. "=" .. v:getOptionData(v.selected);
+	for i,v in pairs(self.clothingMenu) do
+		if v.attachedPanel.selectedInfo and v.attachedPanel.selectedInfo.id ~= nil then
+			savestring = savestring ..  i .. "=" .. v.attachedPanel.selectedInfo.id;
 			if self.clothingColorBtn[i] and self.clothingColorBtn[i]:isVisible() then
 				savestring = savestring .. "|" .. self.clothingColorBtn[i].backgroundColor.r .. "," .. self.clothingColorBtn[i].backgroundColor.g  .. "," .. self.clothingColorBtn[i].backgroundColor.b;
 			end

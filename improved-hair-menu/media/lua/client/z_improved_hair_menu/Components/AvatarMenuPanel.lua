@@ -149,6 +149,14 @@ function AvatarMenuPanel:onAvatarSelect(avatar)
 	self:selectInfo(avatar.visualItem)
 end
 
+function AvatarMenuPanel:findInfoIndex(predicate)
+	for i,info in ipairs(self.info) do
+		if predicate(info) == true then
+			return i
+		end
+	end
+end
+
 -- Silently updates the info selection, avoiding triggering the `onSelect` callback which can cause infinite loops.
 function AvatarMenuPanel:setSelectedInfoIndex(index)
 	self:setSelectedInfo(self.info[index])

@@ -28,19 +28,7 @@ local function createClothingComboUnified(self, bodyLocation, debug)
 	menuButton.bodyLocation = bodyLocation
 
 	function menuButton.attachedPanel.onSelect(info)
-		local desc = MainScreen.instance.desc
-		desc:setWornItem(bodyLocation, nil)
-		local itemType = info.id
-		if itemType then
-			local item = InventoryItemFactory.CreateItem(itemType)
-			if item then
-				desc:setWornItem(bodyLocation, item)
-			end
-		end
-		self:updateSelectedClothingCombo();
-		
-		CharacterCreationHeader.instance.avatarPanel:setSurvivorDesc(desc)
-		self:disableBtn()
+		self:onClothingComboSelected(bodyLocation, info.id)
 	end
 
 	local fontHgt = getTextManager():getFontHeight(self.skinColorLbl.font)
@@ -197,4 +185,19 @@ function CharacterCreationMain:updateSelectedClothingCombo()
 			end
 		end
 	end
+end
+
+function CharacterCreationMain:onClothingComboSelected(bodyLocation, itemType)
+	local desc = MainScreen.instance.desc
+	desc:setWornItem(bodyLocation, nil)
+	if itemType then
+		local item = InventoryItemFactory.CreateItem(itemType)
+		if item then
+			desc:setWornItem(bodyLocation, item)
+		end
+	end
+	self:updateSelectedClothingCombo();
+	
+	CharacterCreationHeader.instance.avatarPanel:setSurvivorDesc(desc)
+	self:disableBtn()
 end
