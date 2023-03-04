@@ -99,7 +99,15 @@ function ISCharacterScreen:hairMenu(button)
 			local hairList2 = {}
 			-- add all "under level" we can find, any level 2 hair can be cut into a level 1
 			for _,hairStyle in ipairs(hairList) do
-				if not hairStyle:isAttachedHair() and not hairStyle:isNoChoose() and hairStyle:getLevel() < currentHairStyle:getLevel() and hairStyle:getName() ~= "" then
+				local canCutLevels = nil
+				-- NOTE: Spongies Hair makes this chnage to the condition which allows you to cut from Long2 to its F_Mitsuru
+				if getActivatedMods():contains("SpnHair") then
+					canCutLevels = hairStyle:getLevel() <= currentHairStyle:getLevel()
+				else
+					canCutLevels = hairStyle:getLevel() < currentHairStyle:getLevel()
+				end
+
+				if not hairStyle:isAttachedHair() and not hairStyle:isNoChoose() and canCutLevels and hairStyle:getName() ~= "" then
 					table.insert(hairList2, hairStyle)
 				end
 			end
