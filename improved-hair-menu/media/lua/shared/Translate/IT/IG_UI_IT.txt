@@ -1,0 +1,12 @@
+IGUI_IT = {
+	IGUI_IHM_use_modal = "Utilizza la Finestra Modale"
+	IGUI_IHM_use_modal_tooltip = "Sostituisce il menu in linea con uno a comparsa. Questo puo' essere utile anche per i monitor a bassa risoluzione."
+	IGUI_IHM_avatar_size = "Dimensione dell'Avatar"
+	IGUI_IHM_avatar_size_tooltip = "Dimensione in pixel di ciascun elemento del menu."
+	IGUI_IHM_hair_rows = "Righe del Menu in linea dei Capelli"
+	IGUI_IHM_hair_cols = "Colonne del Menu in linea dei Capelli"
+	IGUI_IHM_beard_rows = "Righe del Menu in linea della Barba"
+	IGUI_IHM_beard_cols = "Colonne del Menu in linea della Barba"
+	IGUI_IHM_modal_rows = "Righe della Finestra Modale"
+	IGUI_IHM_modal_cols = "Colonne della Finestra Modale"
+}

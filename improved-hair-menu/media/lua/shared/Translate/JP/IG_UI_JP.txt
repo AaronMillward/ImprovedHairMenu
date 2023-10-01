@@ -1,0 +1,12 @@
+IGUI_JP = {
+	IGUI_IHM_use_modal = "モーダルダイアログの使用"
+	IGUI_IHM_use_modal_tooltip = "インラインメニューをポップアウトに置き換えます。これは低解像度のモニターでも有効です。"
+	IGUI_IHM_avatar_size = "アバターサイズ"
+	IGUI_IHM_avatar_size_tooltip = "メニューの各要素のピクセルサイズ"
+	IGUI_IHM_hair_rows = "インライン髪メニューの行数"
+	IGUI_IHM_hair_cols = "インライン髪メニューの列数"
+	IGUI_IHM_beard_rows = "インライン髭メニューの行数"
+	IGUI_IHM_beard_cols = "インライン髭メニューの列数"
+	IGUI_IHM_modal_rows = "モーダルダイアログの行数"
+	IGUI_IHM_modal_cols = "モーダルダイアログの列数"
+}
