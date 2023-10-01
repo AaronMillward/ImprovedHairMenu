@@ -2,9 +2,9 @@
 	This is a UI element that previews a HumanVisual change.
 ]]
 
-require("z_improved_hair_menu/Components/ExtendedUI3DModel")
+local ISUI3DModelExt = require("z_improved_hair_menu/Components/ExtendedUI3DModel.lua")
 
-VisualAvatar = ISUI3DModelExt:derive("VisualAvatar")
+local VisualAvatar = ISUI3DModelExt:derive("VisualAvatar")
 
 function VisualAvatar:new(x, y, width, height)
 	local o = ISUI3DModelExt.new(self, x, y, width, height)
@@ -116,3 +116,5 @@ function VisualAvatar:hideTooltip()
 		self.tooltipUI:removeFromUIManager()
 	end
 end
+
+return VisualAvatar

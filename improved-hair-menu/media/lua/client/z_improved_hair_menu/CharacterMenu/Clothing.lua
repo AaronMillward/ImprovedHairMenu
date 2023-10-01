@@ -2,6 +2,9 @@ local FONT_HGT_SMALL = getTextManager():getFontHeight(UIFont.Small)
 local FONT_HGT_MEDIUM = getTextManager():getFontHeight(UIFont.Medium)
 local FONT_HGT_TITLE = getTextManager():getFontHeight(UIFont.Title)
 
+local AvatarMenuPanel = require("z_improved_hair_menu/Components/AvatarMenuPanel.lua")
+local MenuPanelButton = require("z_improved_hair_menu/Components/MenuButton.lua")
+
 local function createClothingComboUnified(self, bodyLocation, debug)
 	local comboHgt = FONT_HGT_SMALL + 3 * 2
 	local x = 0

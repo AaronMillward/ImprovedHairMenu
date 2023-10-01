@@ -1,6 +1,9 @@
 local FONT_HGT_SMALL = getTextManager():getFontHeight(UIFont.Small)
 local FONT_HGT_MEDIUM = getTextManager():getFontHeight(UIFont.Medium)
 
+local AvatarMenuPanel = require("z_improved_hair_menu/Components/AvatarMenuPanel.lua")
+local MenuPanelButton = require("z_improved_hair_menu/Components/MenuButton.lua")
+
 function CharacterCreationMain:createChestTypeBtn()
 	local comboHgt = FONT_HGT_SMALL + 3 * 2
 	

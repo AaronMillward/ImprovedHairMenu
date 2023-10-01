@@ -3,6 +3,7 @@
 ]]
 
 local IHMmath = require("z_improved_hair_menu/Math.lua")
+local VisualAvatar = require("z_improved_hair_menu/Components/VisualAvatar.lua")
 
 local FONT_HGT_SMALL = getTextManager():getFontHeight(UIFont.Small)
 local FONT_HGT_MEDIUM = getTextManager():getFontHeight(UIFont.Medium)
@@ -13,7 +14,7 @@ local function predicateAvatarIsSelectable(avatar)
 end
 
 local base = ISPanelJoypad
-AvatarMenuPanel = base:derive("AvatarMenuPanel")
+local AvatarMenuPanel = base:derive("AvatarMenuPanel")
 
 function AvatarMenuPanel:render()
 	base.render(self)
@@ -427,3 +428,5 @@ function AvatarMenuPanel:onJoypadDirUp(joypadData)
 		self:setCursor(i)
 	end
 end
+
+return AvatarMenuPanel

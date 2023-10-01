@@ -5,7 +5,7 @@
 require("z_improved_hair_menu/ModCompatibility/ReorganizedInfoScreen.lua")
 require("ISUI/ISUI3DModel")
 local base = ISUI3DModel
-ISUI3DModelExt = base:derive("ISUI3DModelExt")
+local ISUI3DModelExt = base:derive("ISUI3DModelExt")
 
 function ISUI3DModelExt:new(x, y, width, height)
 	local o = base.new(self, x, y, width, height)
@@ -58,3 +58,5 @@ function ISUI3DModelExt:select()
 		self.onSelect(self)
 	end
 end
+
+return ISUI3DModelExt

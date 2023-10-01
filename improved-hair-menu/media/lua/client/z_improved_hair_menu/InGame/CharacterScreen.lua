@@ -8,6 +8,8 @@
 	the vanilla game to get the hairstyles.
 ]]
 
+local HairMenuPanelWindow = require("z_improved_hair_menu/InGame/HairMenuWindow.lua")
+
 local ContextMenu_CutHairFor = string.gsub(getText("ContextMenu_CutHairFor"),"%%1","")
 local ContextMenu_TieHair    = string.gsub(getText("ContextMenu_TieHair")   ,"%%1","")
 

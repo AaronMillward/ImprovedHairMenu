@@ -4,6 +4,9 @@
 	This does overwrite the original code but compared with rearranging the existing elements by hand this just seems easier.
 ]]
 
+local HairMenuPanel = require("z_improved_hair_menu/Components/HairMenuPanel.lua")
+local MenuPanelButton = require("z_improved_hair_menu/Components/MenuButton.lua")
+
 local FONT_HGT_SMALL = getTextManager():getFontHeight(UIFont.Small)
 local FONT_HGT_MEDIUM = getTextManager():getFontHeight(UIFont.Medium)
 

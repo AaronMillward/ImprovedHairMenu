@@ -1,4 +1,5 @@
-HairMenuPanelWindow = ISCollapsableWindowJoypad:derive("HairMenuPanelWindow")
+local HairMenuPanelWindow = ISCollapsableWindowJoypad:derive("HairMenuPanelWindow")
+local HairMenuPanel = require("z_improved_hair_menu/Components/HairMenuPanel.lua")
 
 function HairMenuPanelWindow:new(x, y, width, height, playerNum, char, hairlist)
 	local o = ISCollapsableWindowJoypad.new(self, x, y, width, height)
@@ -87,3 +88,5 @@ function HairMenuPanelWindow:onJoypadDirDown(joypadData)
 	self.hairPanel:onJoypadDirDown(joypadData)
 	ISCollapsableWindowJoypad.onJoypadDirDown(self, joypadData)
 end
+
+return HairMenuPanelWindow

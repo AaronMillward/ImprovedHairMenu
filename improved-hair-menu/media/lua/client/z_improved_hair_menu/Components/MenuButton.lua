@@ -1,4 +1,4 @@
-MenuPanelButton = ISButton:derive("MenuPanelButton")
+local MenuPanelButton = ISButton:derive("MenuPanelButton")
 
 function MenuPanelButton:new(x, y, width, height, title, clicktarget, onclick, onmousedown, allowMouseUpProcessing, panelType, avatarSizeX, avatarSizeY, rows, cols, gap)
 	local o = {}
@@ -15,3 +15,5 @@ function MenuPanelButton:initialise()
 	self.attachedPanel:initialise()
 	self.attachedPanel:setCapture(true)
 end
+
+return MenuPanelButton
