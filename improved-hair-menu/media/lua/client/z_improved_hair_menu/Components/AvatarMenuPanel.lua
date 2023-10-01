@@ -2,6 +2,8 @@
 	Base menu element for showing visual avatars.
 ]]
 
+local IHMmath = require("z_improved_hair_menu/Math.lua")
+
 local FONT_HGT_SMALL = getTextManager():getFontHeight(UIFont.Small)
 local FONT_HGT_MEDIUM = getTextManager():getFontHeight(UIFont.Medium)
 local header_height = FONT_HGT_SMALL + 14
@@ -262,7 +264,7 @@ function AvatarMenuPanel:getCurrentPageSize()
 end
 
 function AvatarMenuPanel:changePage(step)
-	self:showPage(ImprovedHairMenu.math.wrap(self.pageCurrent + step, 1, self:getNumberOfPages()))
+	self:showPage(IHMmath.wrap(self.pageCurrent + step, 1, self:getNumberOfPages()))
 end
 
 function AvatarMenuPanel:showPage(page_number)
@@ -301,10 +303,10 @@ end
 
 function AvatarMenuPanel:getValidCursor(index)
 	-- NOTE: index 1 will always be valid as the page wouldn't exist if there wasn't at least 1 element.
-	local cursor = ImprovedHairMenu.math.clamp(index, 1, self.pageSize)
+	local cursor = IHMmath.clamp(index, 1, self.pageSize)
 	if not self.avatarList[cursor].selectable == true then 
 		for i=0,self.pageSize do
-			local new_cursor = ImprovedHairMenu.math.wrap(cursor - i, 1, self.pageSize) -- NOTE: Move downwards as avatars are seqential.
+			local new_cursor = IHMmath.wrap(cursor - i, 1, self.pageSize) -- NOTE: Move downwards as avatars are seqential.
 			if self.avatarList[new_cursor].selectable == true then 
 				cursor = new_cursor
 				break
@@ -351,7 +353,7 @@ end
 function AvatarMenuPanel:stepCursor(direction)
 	self:ensureCursor()
 
-	local direction = ImprovedHairMenu.math.sign(direction)
+	local direction = IHMmath.sign(direction)
 
 	-- NOTE: `stepCursor` is only called by joypad events we don't need any flags for joypad usage
 	if direction ~= 0 then
