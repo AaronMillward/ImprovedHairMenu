@@ -7,7 +7,7 @@
 	the vanilla elements around and functional which is hard to maintain when the game updates.
 ]]
 
-local function clothingapplyToDesc(visualItem, desc)
+function clothingapplyToDesc(visualItem, desc)
 	local wornItems = desc:getWornItems()
 
 	visualItem.original = {}
@@ -22,7 +22,7 @@ local function clothingapplyToDesc(visualItem, desc)
 	end
 end
 
-local function clothingrestoreDesc(visualItem, desc)
+function clothingrestoreDesc(visualItem, desc)
 	local wornItems = desc:getWornItems()
 	wornItems:clear()
 	for _,wornItem in ipairs(visualItem.original) do
@@ -261,7 +261,7 @@ local function setupDebug(self, desc)
 			menu:setSelectedInfoIndex(i)
 			clothingItem = item:getVisual():getClothingItem()
 		end
-		menuButton:setTitle(menu.selectedInfo.display)
+		menuButton:setTitle(selected.display)
 		
 		updateTextureChoices(self.clothingTextureCombo, clothingItem, item, bodyLocation)
 		updateTint(self.clothingColorBtn, clothingItem, item, bodyLocation)

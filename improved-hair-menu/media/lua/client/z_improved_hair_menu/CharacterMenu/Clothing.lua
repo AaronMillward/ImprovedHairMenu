@@ -68,8 +68,6 @@ local function createClothingComboUnified(self, bodyLocation, debug)
 	table.insert(self.clothingWidgets, { menuButton, button, comboDecal, comboTexture })
 	
 	self.yOffset = self.yOffset + menuButton:getHeight() + 4
-	
-	return
 end
 
 function CharacterCreationMain:createClothingCombo(bodyLocation)
