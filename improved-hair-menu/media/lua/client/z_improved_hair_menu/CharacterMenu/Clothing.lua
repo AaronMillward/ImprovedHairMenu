@@ -2,6 +2,8 @@ local FONT_HGT_SMALL = getTextManager():getFontHeight(UIFont.Small)
 local FONT_HGT_MEDIUM = getTextManager():getFontHeight(UIFont.Medium)
 local FONT_HGT_TITLE = getTextManager():getFontHeight(UIFont.Title)
 
+ImprovedHairMenu = ImprovedHairMenu or {}
+
 local AvatarMenuPanel = require("z_improved_hair_menu/Components/AvatarMenuPanel.lua")
 local MenuPanelButton = require("z_improved_hair_menu/Components/MenuButton.lua")
 
@@ -27,7 +29,7 @@ local function createClothingComboUnified(self, bodyLocation, debug)
 	
 	menuButton.attachedPanel.resetFocusTo = self.clothingPanel
 	menuButton.attachedPanel:setDesc(MainScreen.instance.desc)
-	self:ICSAddPanel(menuButton.attachedPanel)
+	ImprovedHairMenu:RegisterPanel(menuButton.attachedPanel)
 	menuButton.bodyLocation = bodyLocation
 
 	function menuButton.attachedPanel.onSelect(info)
@@ -88,7 +90,7 @@ function CharacterCreationMain:doClothingCombo(definition, erasePrevious)
 				self.clothingPanel:removeChild(self.clothingColorBtn[v.bodyLocation]);
 				self.clothingPanel:removeChild(self.clothingTextureCombo[v.bodyLocation]);
 				self.clothingPanel:removeChild(self.clothingComboLabel[v.bodyLocation]);
-				self:ICSRemovePanel(v.attachedPanel)
+				ImprovedHairMenu:UnregisterPanel(v.attachedPanel)
 				self.clothingPanel:removeChild(v);
 			end
 		end

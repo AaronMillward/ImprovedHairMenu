@@ -1,6 +1,8 @@
 local FONT_HGT_SMALL = getTextManager():getFontHeight(UIFont.Small)
 local FONT_HGT_MEDIUM = getTextManager():getFontHeight(UIFont.Medium)
 
+ImprovedHairMenu = ImprovedHairMenu or {}
+
 local AvatarMenuPanel = require("z_improved_hair_menu/Components/AvatarMenuPanel.lua")
 local MenuPanelButton = require("z_improved_hair_menu/Components/MenuButton.lua")
 
@@ -50,7 +52,7 @@ function CharacterCreationMain:createChestTypeBtn()
 	
 	self.skinColorButton.attachedPanel.resetFocusTo = self.characterPanel
 	self.skinColorButton.attachedPanel:setDesc(MainScreen.instance.desc)
-	self:ICSAddPanel(self.skinColorButton.attachedPanel)
+	ImprovedHairMenu:RegisterPanel(self.skinColorButton.attachedPanel)
 
 	function self.skinColorButton.attachedPanel.onSelect(info)
 		self:ICSonSkinColorSelected(info.id)

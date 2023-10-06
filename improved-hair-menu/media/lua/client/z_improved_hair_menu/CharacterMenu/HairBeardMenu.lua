@@ -4,6 +4,8 @@
 	This does overwrite the original code but compared with rearranging the existing elements by hand this just seems easier.
 ]]
 
+ImprovedHairMenu = ImprovedHairMenu or {}
+
 local HairMenuPanel = require("z_improved_hair_menu/Components/HairMenuPanel.lua")
 local MenuPanelButton = require("z_improved_hair_menu/Components/MenuButton.lua")
 
@@ -66,7 +68,7 @@ function CharacterCreationMain:createHairTypeBtn()
 	end
 	self.hairMenu.resetFocusTo = self.characterPanel
 	self.hairMenu:setDesc(MainScreen.instance.desc)
-	self:ICSAddPanel(self.hairMenu)
+	ImprovedHairMenu:RegisterPanel(self.hairMenu)
 
 	local hairColors = MainScreen.instance.desc:getCommonHairColor();
 	local hairColors1 = {}
@@ -203,7 +205,7 @@ function CharacterCreationMain:createBeardTypeBtn()
 	end
 	self.beardMenu.resetFocusTo = self.characterPanel
 	self.beardMenu:setDesc(MainScreen.instance.desc)
-	self:ICSAddPanel(self.beardMenu)
+	ImprovedHairMenu:RegisterPanel(self.beardMenu)
 
 	----------------------
 	-- STUBBLE
