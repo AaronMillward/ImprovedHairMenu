@@ -112,8 +112,8 @@ function CharacterCreationMain:doClothingCombo(definition, erasePrevious)
 			table.insert(menuButton.attachedPanel.info, {
 					id = nil,
 					display = getText("UI_characreation_clothing_none"),
-					applyToDesc = clothingapplyToDesc,
-					restoreDesc = clothingrestoreDesc,
+					applyToDesc = ImprovedHairMenu.clothingapplyToDesc,
+					restoreDesc = ImprovedHairMenu.clothingrestoreDesc,
 					bodyLocation = bodyLocation,
 				}
 			)
@@ -123,8 +123,8 @@ function CharacterCreationMain:doClothingCombo(definition, erasePrevious)
 			table.insert(menuButton.attachedPanel.info, {
 				id = nil,
 				display = getText("UI_characreation_clothing_none"),
-				applyToDesc = clothingapplyToDesc,
-				restoreDesc = clothingrestoreDesc,
+				applyToDesc = ImprovedHairMenu.clothingapplyToDesc,
+				restoreDesc = ImprovedHairMenu.clothingrestoreDesc,
 				bodyLocation = bodyLocation,
 			})
 		end
@@ -141,8 +141,8 @@ function CharacterCreationMain:doClothingCombo(definition, erasePrevious)
 				table.insert(menuButton.attachedPanel.info, {
 					id = clothing,
 					display = displayName,
-					applyToDesc = clothingapplyToDesc,
-					restoreDesc = clothingrestoreDesc,
+					applyToDesc = ImprovedHairMenu.clothingapplyToDesc,
+					restoreDesc = ImprovedHairMenu.clothingrestoreDesc,
 					bodyLocation = bodyLocation,
 				})
 			end

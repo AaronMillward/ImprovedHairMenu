@@ -7,7 +7,10 @@
 	the vanilla elements around and functional which is hard to maintain when the game updates.
 ]]
 
-function clothingapplyToDesc(visualItem, desc)
+ImprovedHairMenu = ImprovedHairMenu or {}
+
+
+function ImprovedHairMenu.clothingapplyToDesc(visualItem, desc)
 	local wornItems = desc:getWornItems()
 
 	visualItem.original = {}
@@ -22,7 +25,7 @@ function clothingapplyToDesc(visualItem, desc)
 	end
 end
 
-function clothingrestoreDesc(visualItem, desc)
+function ImprovedHairMenu.clothingrestoreDesc(visualItem, desc)
 	local wornItems = desc:getWornItems()
 	wornItems:clear()
 	for _,wornItem in ipairs(visualItem.original) do
@@ -116,8 +119,8 @@ local function updateCombo(self, desc)
 			{
 				id = nil,
 				display = getText("UI_characreation_clothing_none"),
-				applyToDesc = clothingapplyToDesc,
-				restoreDesc = clothingrestoreDesc,
+				applyToDesc = ImprovedHairMenu.clothingapplyToDesc,
+				restoreDesc = ImprovedHairMenu.clothingrestoreDesc,
 				bodyLocation = bodyLocation,
 			},
 		}
@@ -128,8 +131,8 @@ local function updateCombo(self, desc)
 				{
 					id = fullType,
 					display = displayName,
-					applyToDesc = clothingapplyToDesc,
-					restoreDesc = clothingrestoreDesc,
+					applyToDesc = ImprovedHairMenu.clothingapplyToDesc,
+					restoreDesc = ImprovedHairMenu.clothingrestoreDesc,
 					bodyLocation = bodyLocation,
 				}
 			)
