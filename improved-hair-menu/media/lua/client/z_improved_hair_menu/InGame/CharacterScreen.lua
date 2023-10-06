@@ -8,6 +8,9 @@
 	the vanilla game to get the hairstyles.
 ]]
 
+ImprovedHairMenu = ImprovedHairMenu or {}
+ImprovedHairMenu.ingame = ImprovedHairMenu.ingame or {}
+
 local HairMenuPanelWindow = require("z_improved_hair_menu/InGame/HairMenuWindow.lua")
 
 local ContextMenu_CutHairFor = string.gsub(getText("ContextMenu_CutHairFor"),"%%1","")
@@ -152,10 +155,10 @@ function ISCharacterScreen:hairMenu(button)
 		end
 
 		if #tie_options > 0 then
-			hairMenu:addOption(ContextMenu_TieHair, self, self.ICSOpenHairMenu, tie_options, ContextMenu_TieHair, false)
+			hairMenu:addOption(ContextMenu_TieHair, self, ImprovedHairMenu.ingame.openHairMenu, tie_options, ContextMenu_TieHair, false)
 		end
 		if #cut_options > 0 then
-			hairMenu:addOption(ContextMenu_CutHairFor, self, self.ICSOpenHairMenu, cut_options, ContextMenu_CutHairFor, false)
+			hairMenu:addOption(ContextMenu_CutHairFor, self, ImprovedHairMenu.ingame.openHairMenu, cut_options, ContextMenu_CutHairFor, false)
 		end
 	else
 		local hairMenu = context
@@ -234,7 +237,7 @@ function ISCharacterScreen:beardMenu(button)
 
 		if #options > 0 then
 			local ContextMenu_TrimBeard_For = string.gsub(getText("ContextMenu_TrimBeard_For"),"%%1","")
-			context:addOption(ContextMenu_TrimBeard_For, self, self.ICSOpenHairMenu, options, ContextMenu_TrimBeard_For, true)
+			context:addOption(ContextMenu_TrimBeard_For, self, ImprovedHairMenu.ingame.openHairMenu, self, options, ContextMenu_TrimBeard_For, true)
 		end
 	else
 		local beardMenu = context
@@ -251,23 +254,24 @@ function ISCharacterScreen:beardMenu(button)
 	end
 end
 
-local openedMenu = nil
+ImprovedHairMenu.ingame.openedMenu = nil
 
-function ISCharacterScreen:ICSOpenHairMenu(hairOptions, title, isBeard)
-	local player = self.char
-	local menu = HairMenuPanelWindow:new(200,200,400,400, self.playerNum, self.char, hairOptions)
-	menu.returnFocus = self
+function ImprovedHairMenu.ingame.openHairMenu(characterScreen, hairOptions, title, isBeard)
+	local player = characterScreen.char
+
+	local menu = HairMenuPanelWindow:new(200,200,400,400, characterScreen.playerNum, characterScreen.char, hairOptions)
+	menu.returnFocus = characterScreen
 	if isBeard == true then 
 		menu.onSelect = function(selection)
 			ISCharacterScreen.onTrimBeard(player, selection.id)
 			menu:close()
-			openedMenu = nil
+			ImprovedHairMenu.ingame.openedMenu = nil
 		end
 	else
 		menu.onSelect = function(selection)
 			ISCharacterScreen.onCutHair(player, selection.id, selection.actionTime)
 			menu:close()
-			openedMenu = nil
+			ImprovedHairMenu.ingame.openedMenu = nil
 		end
 	end
 
@@ -275,9 +279,9 @@ function ISCharacterScreen:ICSOpenHairMenu(hairOptions, title, isBeard)
 	menu.title = title
 	menu:addToUIManager()
 
-	if openedMenu ~= nil then
-		openedMenu:close()
+	if ImprovedHairMenu.ingame.openedMenu ~= nil then
+		ImprovedHairMenu.ingame.openedMenu:close()
 	end
-	openedMenu = menu
-	setJoypadFocus(self.playerNum, openedMenu)
+	ImprovedHairMenu.ingame.openedMenu = menu
+	setJoypadFocus(characterScreen.playerNum, ImprovedHairMenu.ingame.openedMenu)
 end
