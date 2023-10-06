@@ -1,5 +1,6 @@
 
--- NOTE: Vanilla unless comments says otherwise
+ImprovedHairMenu = ImprovedHairMenu or {}
+
 function CharacterCreationMain:loadOutfit(box)
 	local name = box.options[box.selected];
 	if name == nil then return end;
@@ -25,10 +26,10 @@ function CharacterCreationMain:loadOutfit(box)
 			desc:getWornItems():clear();
 		elseif location[1] == "skincolor" then --Modified
 			local color = luautils.split(options[1], ",");
-			local index = self:ICSGetSkinRGBAsIndex(
+			local index = ImprovedHairMenu:getSkinRGBAsIndex(
 				{ r = tonumber(color[1]), g = tonumber(color[2]), b = tonumber(color[3]) }
 			)
-			self:ICSonSkinColorSelected(index, true)
+			ImprovedHairMenu:onSkinColorSelected(self, CharacterCreationHeader.instance, index)
 		elseif location[1] == "name" then
 			desc:setForename(options[1]);
 			MainScreen.instance.charCreationHeader.forenameEntry:setText(options[1]);

@@ -30,23 +30,16 @@ function CharacterCreationMain:createChestTypeBtn()
 	self.characterPanel:addChild(self.skinColorLbl);
 	
 	local xColor = 90;
-	self.skinColors = {
-		{r=1,g=0.91,b=0.72},
-		{r=0.98,g=0.79,b=0.49},
-		{r=0.8,g=0.65,b=0.45},
-		{r=0.54,g=0.38,b=0.25},
-		{r=0.36,g=0.25,b=0.14}
-	}
 	
 	local avatar_size = ImprovedHairMenu.settings:get_avatar_size()
 	self.skinColorButton = MenuPanelButton:new(
 		self.xOffset+xColor, self.yOffset, 45, comboHgt, "",
 		self, CharacterCreationMain.onSkinColorButtonClick, nil, nil, 
-		AvatarMenuPanel, avatar_size, avatar_size * 1.5, 1, #self.skinColors, 3, false
+		AvatarMenuPanel, avatar_size, avatar_size * 1.5, 1, #ImprovedHairMenu.skinColors, 3, false
 	)
 	self.skinColorButton:initialise()
 	self.skinColorButton:instantiate()
-	local color = self.skinColors[1]
+	local color = ImprovedHairMenu.skinColors[1]
 	self.skinColorButton.backgroundColor = {r = color.r, g = color.g, b = color.b, a = 1}
 	self.characterPanel:addChild(self.skinColorButton)
 	
@@ -55,7 +48,7 @@ function CharacterCreationMain:createChestTypeBtn()
 	ImprovedHairMenu:RegisterPanel(self.skinColorButton.attachedPanel)
 
 	function self.skinColorButton.attachedPanel.onSelect(info)
-		self:ICSonSkinColorSelected(info.id)
+		ImprovedHairMenu:onSkinColorSelected(self, CharacterCreationHeader.instance, info.id)
 	end
 	
 	self.skinColorButton.attachedPanel:setInfoTable({
@@ -120,16 +113,24 @@ function CharacterCreationMain:onSkinColorButtonClick(button)
 	end
 end
 
-function CharacterCreationMain:ICSonSkinColorSelected(index)
-	local color = self.skinColors[index+1]
-	self.skinColorButton.backgroundColor = { r=color.r, g=color.g, b=color.b, a = 1 }
+function ImprovedHairMenu:onSkinColorSelected(characterCreationMain, characterCreationHeader, index)
+	local color = ImprovedHairMenu.skinColors[index+1]
+	characterCreationMain.skinColorButton.backgroundColor = { r=color.r, g=color.g, b=color.b, a = 1 }
 	local desc = MainScreen.instance.desc
 	desc:getHumanVisual():setSkinTextureIndex(index)
-	CharacterCreationHeader.instance.avatarPanel:setSurvivorDesc(desc)
-	self:disableBtn()
+	characterCreationHeader.avatarPanel:setSurvivorDesc(desc)
+	characterCreationMain:disableBtn()
 end
 
-function CharacterCreationMain:ICSGetSkinRGBAsIndex(color)
+ImprovedHairMenu.skinColors = {
+	{r=1,g=0.91,b=0.72},
+	{r=0.98,g=0.79,b=0.49},
+	{r=0.8,g=0.65,b=0.45},
+	{r=0.54,g=0.38,b=0.25},
+	{r=0.36,g=0.25,b=0.14}
+}
+
+function ImprovedHairMenu:getSkinRGBAsIndex(color)
 	for i,sc in ipairs(self.skinColors) do
 		if sc.r == color.r and sc.g == color.g and sc.b == color.b then
 			return i-1
@@ -137,6 +138,6 @@ function CharacterCreationMain:ICSGetSkinRGBAsIndex(color)
 	end
 end
 
-function CharacterCreationMain:ICSGetSkinIndexAsRHB(index)
+function ImprovedHairMenu:getSkinIndexAsRHB(index)
 	return self.skinColors[index+1]
 end

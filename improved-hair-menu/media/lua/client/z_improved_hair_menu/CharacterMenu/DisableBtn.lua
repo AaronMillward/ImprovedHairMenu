@@ -159,8 +159,8 @@ local function setMaleVisiblity(self, visible)
 end
 
 local function updateSkinColor(self)
-	if self.skinColors and self.skinColor then
-		local color = self.skinColors[self.skinColor]
+	if ImprovedHairMenu.skinColors and self.skinColor then
+		local color = ImprovedHairMenu.skinColors[self.skinColor]
 		self.skinColorButton.backgroundColor.r = color.r
 		self.skinColorButton.backgroundColor.g = color.g
 		self.skinColorButton.backgroundColor.b = color.b
