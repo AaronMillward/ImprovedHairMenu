@@ -226,7 +226,7 @@ local function updateTint(clothingColorBtn, clothingItem, item, bodyLocation)
 	end
 end
 
-local function updateDecal(clothingDecalCombo, clothingItem, item, bodyLocation)
+local function updateDecal(self, clothingDecalCombo, clothingItem, item, bodyLocation)
 	if clothingItem and clothingItem:getDecalGroup() then
 		-- Fill the decal combo if a different clothing item is now selected.
 		if self.decalItem ~= item then
@@ -265,7 +265,7 @@ local function setupDebug(self, desc)
 		
 		updateTextureChoices(self.clothingTextureCombo, clothingItem, item, bodyLocation)
 		updateTint(self.clothingColorBtn, clothingItem, item, bodyLocation)
-		updateDecal(self.clothingDecalCombo, clothingItem, item, bodyLocation)
+		updateDecal(self, self.clothingDecalCombo, clothingItem, item, bodyLocation)
 	end
 end
 

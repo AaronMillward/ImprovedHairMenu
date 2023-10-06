@@ -149,6 +149,7 @@ function CharacterCreationMain:doClothingCombo(definition, erasePrevious)
 		end
 
 		menuButton.attachedPanel:showPage(1)
+		menuButton:setTitle(menuButton.attachedPanel.selectedInfo.display)
 	end
 	
 	self:updateSelectedClothingCombo();
