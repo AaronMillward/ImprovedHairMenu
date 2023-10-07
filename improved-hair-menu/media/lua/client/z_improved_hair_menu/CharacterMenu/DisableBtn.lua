@@ -9,8 +9,7 @@
 
 ImprovedHairMenu = ImprovedHairMenu or {}
 
-
-function ImprovedHairMenu.clothingapplyToDesc(visualItem, desc)
+function ImprovedHairMenu.clothingApplyToDesc(visualItem, desc)
 	local wornItems = desc:getWornItems()
 
 	visualItem.original = {}
@@ -25,7 +24,7 @@ function ImprovedHairMenu.clothingapplyToDesc(visualItem, desc)
 	end
 end
 
-function ImprovedHairMenu.clothingrestoreDesc(visualItem, desc)
+function ImprovedHairMenu.clothingRestoreDesc(visualItem, desc)
 	local wornItems = desc:getWornItems()
 	wornItems:clear()
 	for _,wornItem in ipairs(visualItem.original) do
@@ -109,6 +108,7 @@ local function updateCombo(self, desc)
 	local fillMenu = function(bodyLocation)
 		local menu = self.clothingMenu[bodyLocation]
 		local items = getAllItemsForBodyLocation(bodyLocation)
+		--TODO:FIXME: Potentially slow sort
 		table.sort(items, function(a,b)
 			local itemA = ScriptManager.instance:FindItem(a)
 			local itemB = ScriptManager.instance:FindItem(b)
@@ -119,8 +119,8 @@ local function updateCombo(self, desc)
 			{
 				id = nil,
 				display = getText("UI_characreation_clothing_none"),
-				applyToDesc = ImprovedHairMenu.clothingapplyToDesc,
-				restoreDesc = ImprovedHairMenu.clothingrestoreDesc,
+				applyToDesc = ImprovedHairMenu.clothingApplyToDesc,
+				restoreDesc = ImprovedHairMenu.clothingRestoreDesc,
 				bodyLocation = bodyLocation,
 			},
 		}
@@ -131,8 +131,8 @@ local function updateCombo(self, desc)
 				{
 					id = fullType,
 					display = displayName,
-					applyToDesc = ImprovedHairMenu.clothingapplyToDesc,
-					restoreDesc = ImprovedHairMenu.clothingrestoreDesc,
+					applyToDesc = ImprovedHairMenu.clothingApplyToDesc,
+					restoreDesc = ImprovedHairMenu.clothingRestoreDesc,
 					bodyLocation = bodyLocation,
 				}
 			)
