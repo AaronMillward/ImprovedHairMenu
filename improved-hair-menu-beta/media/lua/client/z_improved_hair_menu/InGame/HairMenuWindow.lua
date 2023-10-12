@@ -1,11 +1,13 @@
-HairMenuPanelWindow = ISCollapsableWindowJoypad:derive("HairMenuPanelWindow")
+local HairMenuPanelWindow = ISCollapsableWindowJoypad:derive("HairMenuPanelWindow")
+local HairMenuPanel = require("z_improved_hair_menu/Components/HairMenuPanel.lua")
 
-function HairMenuPanelWindow:new(x, y, width, height, playerNum, char, hairlist, isbeard)
+function HairMenuPanelWindow:new(x, y, width, height, playerNum, char, hairlist)
 	local o = ISCollapsableWindowJoypad.new(self, x, y, width, height)
+	setmetatable(o, self)
+	self.__index = self
 	o.char = char
 	o.hairList = hairlist
 	o.onSelect = nil
-	o.isbeard = isbeard
 	o.playerNum = playerNum
 	return o
 end
@@ -27,14 +29,14 @@ function HairMenuPanelWindow:createChildren()
 	local th = self:titleBarHeight()
 	self.resizable = false
 
-	self.hairPanel = HairMenuPanel:new(0,th, 96,96, 2,3, 3, self.isbeard)
+	self.hairPanel = HairMenuPanel:new(0,th, 96,96, 2,3, 3, false)
 	self.hairPanel.showSelectedName = false
 	self.hairPanel:initialise()
 	self.hairPanel:setChar(self.char)
 	self.hairPanel.onSelect = function(select_name)
 		self.onSelect(select_name)
 	end
-	self.hairPanel:setHairList(self.hairList)
+	self.hairPanel:setInfoTable(self.hairList)
 	self:addChild(self.hairPanel)
 
 	self:setWidth(self.hairPanel:getWidth())
@@ -86,3 +88,5 @@ function HairMenuPanelWindow:onJoypadDirDown(joypadData)
 	self.hairPanel:onJoypadDirDown(joypadData)
 	ISCollapsableWindowJoypad.onJoypadDirDown(self, joypadData)
 end
+
+return HairMenuPanelWindow

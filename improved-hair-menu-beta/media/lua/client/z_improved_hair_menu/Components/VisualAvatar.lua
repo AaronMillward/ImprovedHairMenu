@@ -2,12 +2,14 @@
 	This is a UI element that previews a HumanVisual change.
 ]]
 
-require("z_improved_hair_menu/Components/ExtendedUI3DModel")
+local ISUI3DModelExt = require("z_improved_hair_menu/Components/ExtendedUI3DModel.lua")
 
-VisualAvatar = ISUI3DModelExt:derive("VisualAvatar")
+local VisualAvatar = ISUI3DModelExt:derive("VisualAvatar")
 
 function VisualAvatar:new(x, y, width, height)
 	local o = ISUI3DModelExt.new(self, x, y, width, height)
+	setmetatable(o, self)
+	self.__index = self
 	o.visualItem = {id = "UNINITIALIZED", display = "UNINITIALIZED", selected = false}
 	o.desc = nil
 	o.char = nil
@@ -36,12 +38,10 @@ end
 
 function VisualAvatar:setDesc(desc)
 	self.desc = desc
-	self.char = nil
 end
 
 function VisualAvatar:setChar(char)
-	self.char = char
-	self.desc = nil
+	self.desc = char:getDescriptor()
 end
 
 function VisualAvatar:setVisualItem(args)
@@ -50,52 +50,39 @@ end
 
 function VisualAvatar:applyVisual()
 	--[[ XXX:
-		The getter and setter functions will affect the visual for all other avatars. this is due
-		to the visual being a table which is passed by reference in lua. this means we have to revert
-		any changes made while we're in here.
+		The desc is shared between the whole UI so this means we have to revert any changes made while we're in here.
 
 		This still works because when passing the visual to the 3D element the java side makes a copy
 		instead of referencing the table.
 	 ]]
 
-	--[[ XXX:
-		It has to be done like this with 2 separate variables for the char/desc. we can't seem to pass
-		the char/desc as a parameter because comparing the java types doesn't work everywhere.
-		Possibly something to do with java environment?
-	 ]]
+	if not self.desc then return end
 
-	local visual = nil
-
-	if self.desc then
-		visual = self.desc:getHumanVisual()
-	elseif self.char then
-		visual = self.char:getHumanVisual()
-	else
-		return
+	if not self.visualItem.applyToDesc then
+		if not self.visualItem.getterName then return end
+		if not self.visualItem.setterName then return end
+		
+		self.visualItem.applyToDesc = function (visualItem, desc)
+			local visual = desc:getHumanVisual()
+			visualItem.original = visual[visualItem.getterName](visual)
+			visual[visualItem.setterName](visual, visualItem.id)
+		end
 	end
 
-	local getter = visual[self.visualItem.getterName]
-	local setter = visual[self.visualItem.setterName]
-
-	-- NOTE: Unitialized items won't have getters or setters.
-	if not (getter and setter) then
-		return
+	if not self.visualItem.restoreDesc then
+		if not self.visualItem.setterName then return end
+		self.visualItem.restoreDesc = function (visualItem, desc)
+			local visual = desc:getHumanVisual()
+			visual[visualItem.setterName](visual, visualItem.original)
+		end
 	end
 
-	local original_item = getter(visual)
+	self.visualItem:applyToDesc(self.desc)
 
-	if self.visualItem and self.visualItem.id then
-		setter(visual, self.visualItem.id)
-	end
-	
 	-- NOTE: This appears to copy the data likely because ISUI3DModel has a java call that copies the table into an object
-	if self.desc then 
-		self:setSurvivorDesc(self.desc)
-	elseif self.char then
-		self:setCharacter(self.char)
-	end
+	self:setSurvivorDesc(self.desc)
 
-	setter(visual, original_item)
+	self.visualItem:restoreDesc(self.desc)
 end
 
 function VisualAvatar:setCursor(state)
@@ -129,3 +116,5 @@ function VisualAvatar:hideTooltip()
 		self.tooltipUI:removeFromUIManager()
 	end
 end
+
+return VisualAvatar

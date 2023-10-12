@@ -1,14 +1,16 @@
-require("z_improved_hair_menu/Components/VisualAvatar")
+local VisualAvatar = require("z_improved_hair_menu/Components/VisualAvatar")
 
-HairAvatar = VisualAvatar:derive("HairAvatar")
+local HairAvatar = VisualAvatar:derive("HairAvatar")
 
 function HairAvatar:select()
 	-- NOTE: Don't allow selection of hairs missing a requirement.
 	-- XXX: This is only used by the in-game menu, maybe the in-game should override this function instead?
 	if self.visualItem.requirements then
-		if self.visualItem.requirements.scissors == false then return end
-		if self.visualItem.requirements.scissors == false and self.visualItem.requirements.razor == false then return end -- HACK: Razor only appears along side scissors in an OR relationship
-		if self.visualItem.requirements.hairgel == false then return end
+		if self.visualItem.requirements.razor ~= nil and self.visualItem.requirements.scissors ~= nil  then
+			if self.visualItem.requirements.razor == false and self.visualItem.requirements.scissors == false then return end
+		elseif self.visualItem.requirements.scissors ~= nil  then
+			if self.visualItem.requirements.scissors == false then return end
+		elseif self.visualItem.requirements.hairgel == false then return end
 	end
 
 	VisualAvatar.select(self)
@@ -59,3 +61,5 @@ function HairAvatar:instantiate()
 	self:setYOffset(-0.9);
 	self:setXOffset(0);
 end
+
+return HairAvatar
